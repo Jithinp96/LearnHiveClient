@@ -111,6 +111,36 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
     }
   };
 
+  const handleResendOTP = async () => {
+    try {
+      console.log('Resending OTP...');
+      const endpoint = registrationType === 'student' ? '/students/resend-otp' : '/tutor/resend-otp';
+  
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}${endpoint}`, {}, 
+      {
+        withCredentials: true,
+      });
+  
+      console.log("Resend OTP Response: ", response);
+  
+      if (response.status >= 200 && response.status < 300) {
+        
+        console.log('OTP resent successfully');
+      } else {
+        console.error('Failed to resend OTP:', response.data.message);
+        setErrorMessage(response.data.message || 'Failed to resend OTP');
+      }
+    } catch (error) {
+      console.error('Error during OTP resend:', error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || 'Network error';
+        setErrorMessage(errorMessage);
+      } else {
+        setErrorMessage('An unknown error occurred');
+      }
+    }
+  };
+
   return (
     <>
       <h2>{registrationType === 'student' ? 'Student Verification' : 'Tutor Verification'}</h2>
@@ -148,7 +178,9 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
                 <p className="text-lg font-[100] leading-5 tracking-[0.5px] mb-5">
                   Enter the verification code to complete your account setup.
                 </p>
-                <button className="rounded-[20px] border border-solid border-white bg-transparent text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                <button 
+                  onClick={handleResendOTP}
+                  className="rounded-[20px] border border-solid border-white bg-transparent text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
                   Resend Code
                 </button>
               </div>

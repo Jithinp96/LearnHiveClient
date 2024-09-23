@@ -6,7 +6,7 @@ import OTPForm from "../../components/studentComponents/AuthPages/OTPForm";
 
 const OTPPage: React.FC = () => {
     const location = useLocation();
-    const registrationType = location.state?.registrationType || 'student'
+    const registrationType = location.state?.registrationType || 'student';
     
     return (
         <>

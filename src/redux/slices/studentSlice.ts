@@ -14,22 +14,6 @@ const initialState: StudentState = {
     studentInfo: null,
 };
 
-// export const loginStudent = createAsyncThunk(
-//     'student/login',
-//     async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
-//         try {
-//             const response = await loginStudentAPI(email, password);
-//             if (response && response.data) {
-//                 return response.data.student;
-//             } else {
-//                 throw new Error('Login failed');
-//             }
-//         } catch (error) {
-//                 return rejectWithValue(error || 'Login failed');
-//         }
-//     }
-// );
-
 const studentSlice = createSlice({
     name: 'student',
     initialState,
