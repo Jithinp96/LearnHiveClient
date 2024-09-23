@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-
 export interface StudentState {
     loading: boolean;
     error: string | null;

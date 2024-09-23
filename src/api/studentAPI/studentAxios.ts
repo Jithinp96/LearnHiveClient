@@ -27,6 +27,9 @@ export const loginStudentAPI = async (email: string, password: string) => {
             {
                 email, 
                 password
+            },
+            {
+                withCredentials: true
             }
         )
     } catch (error) {
