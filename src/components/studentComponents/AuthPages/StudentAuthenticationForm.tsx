@@ -1,19 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../../redux/slices/studentSlice";
 
 import { loginStudentAPI, registerStudentAPI } from "../../../api/studentAPI/studentAxios";
-
 import StudentRegistrationForm from "./StudentRegistrationForm";
 import StudentSignInForm from "./StudentSignInForm";
 
 const AuthenticationForm: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const registrationType = 'student';
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
+    setErrorMessage(null);
   };
 
   const handleRegister = async (
@@ -30,10 +35,16 @@ const AuthenticationForm: React.FC = () => {
   };
 
   const handleSignIn =  async(email: string, password: string) => {
+    setLoading(true);
+    setErrorMessage(null);
+
     const response = await loginStudentAPI(email, password);
+    setLoading(false);
     
     
     if(response && response.status === 200) {
+      dispatch(loginSuccess(response.data.student));
+      console.log(response.data.student.email);
       navigate("/dashboard");
     } else {
       console.error("Invalid credentials or server error");
@@ -61,7 +72,7 @@ const AuthenticationForm: React.FC = () => {
               : "opacity-100 z-5"
           }`}
         >
-          <StudentSignInForm onSignIn={handleSignIn} />
+          <StudentSignInForm onSignIn={handleSignIn} errorMessage={errorMessage} loading={loading}/>
         </div>
         <div className="absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-transform duration-600 ease-in-out z-100">
           <div

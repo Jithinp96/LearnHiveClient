@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { registerTutorAPI } from "../../../api/tutorAPI/tutorAxios";
+import { loginTutorAPI, registerTutorAPI } from "../../../api/tutorAPI/tutorAxios";
 
 import TutorRegistrationForm from "./TutorRegistrationForm";
 import TutorSignInForm from "./TutorSignInForm";
@@ -29,7 +29,15 @@ const TutorAuthenticationForm: React.FC = () => {
         navigate("/otp-verify", { state: { registrationType } });
     }
     };
-    const handleSignIn = () => {};
+    const handleSignIn = async (email: string, password: string) => {
+        const response = await loginTutorAPI(email, password);
+
+        if(response && response.status === 200) {
+            navigate("/tutor/dashboard");
+        } else {
+            console.error("Invalid credentials or server error");
+        }
+    };
 
     return (
         <div className="bg-[#f6f5f7] flex justify-center items-center flex-col font-['Montserrat',sans-serif] min-h-screen py-10">

@@ -37,6 +37,13 @@ export const loginStudentAPI = async (email: string, password: string) => {
     }
 }
 
+export const logoutStudentAPI = async (role: string) => {
+    return await axios.post(
+        `${import.meta.env.VITE_API_URL}/students/logout/${role}`, 
+        {}, 
+        { withCredentials: true });
+}
+
 export const getStudentsListAPI = async () => {
     try {
         return await axios.get(`${import.meta.env.VITE_API_URL}/admin/students`, {

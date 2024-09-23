@@ -15,6 +15,7 @@ import AdminSignInPage from './pages/adminPages/AdminSignInPage';
 import AdminDashboardPage from './pages/adminPages/AdminDashboardPage';
 import AdminStudentPage from './pages/adminPages/AdminStudentPage';
 import AdminStudentDetailsPage from './pages/adminPages/AdminStudentDetailsPage';
+import TutorDashboardPage from './pages/tutorPages/TutorDashboardPage';
 
 const App: React.FC = () => {
     return (
@@ -26,6 +27,7 @@ const App: React.FC = () => {
                 <Route path="/dashboard" element={<DashboardPage />} />
 
                 <Route path='/tutors/auth' element = {<TutorAuthPage />} />
+                <Route path='tutor/dashboard' element={< TutorDashboardPage />} />
 
                 <Route path='/admin/signin' element={<AdminSignInPage />} />
                 <Route path='/admin/dashboard' element={<AdminDashboardPage />} />
