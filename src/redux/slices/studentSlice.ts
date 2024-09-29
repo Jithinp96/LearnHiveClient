@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface StudentState {
-    loading: boolean;
-    error: string | null;
-    isAuthenticated: boolean;
+    studentLoading: boolean;
+    studentError: string | null;
+    isStudentAuthenticated: boolean;
     studentInfo: { name: string; email: string, studentId: string, role: string } | null; 
 }
 
 const initialState: StudentState = {
-    loading: false,
-    error: null,
-    isAuthenticated: false,
+    studentLoading: false,
+    studentError: null,
+    isStudentAuthenticated: false,
     studentInfo: null,
 };
 
@@ -19,18 +19,18 @@ const studentSlice = createSlice({
     initialState,
     reducers: {
       logoutStudent: (state) => {
-        state.isAuthenticated = false;
+        state.isStudentAuthenticated = false;
         state.studentInfo = null;
       },
-      loginSuccess(state, action: PayloadAction<any>) {
-        state.loading = false;
-        state.isAuthenticated = true;
+      studentLoginSuccess(state, action: PayloadAction<any>) {
+        state.studentLoading = false;
+        state.isStudentAuthenticated = true;
         state.studentInfo = action.payload;
     },
     },
   });
   
 
-export const { logoutStudent, loginSuccess } = studentSlice.actions;
+export const { logoutStudent, studentLoginSuccess } = studentSlice.actions;
 
 export default studentSlice.reducer;

@@ -2,17 +2,33 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import studentReducer from './slices/studentSlice';
+import tutorReducer from './slices/tutorSlice';
+import adminReducer from './slices/adminSlice';
 
-const persistConfig = {
-    key: 'root',
+const studentPersistConfig = {
+    key: 'student',
     storage,
 };
-
-const persistedReducer = persistReducer(persistConfig, studentReducer);
+  
+const tutorPersistConfig = {
+    key: 'tutor',
+    storage,
+};
+  
+const adminPersistConfig = {
+    key: 'admin',
+    storage,
+};
+  
+const persistedStudentReducer = persistReducer(studentPersistConfig, studentReducer);
+const persistedTutorReducer = persistReducer(tutorPersistConfig, tutorReducer);
+const persistedAdminReducer = persistReducer(adminPersistConfig, adminReducer);
 
 export const store = configureStore({
     reducer: {
-        student: persistedReducer,
+        student: persistedStudentReducer,
+        tutor: persistedTutorReducer,
+        admin: persistedAdminReducer,
     },
 });
 

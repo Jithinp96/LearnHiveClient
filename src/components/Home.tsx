@@ -41,7 +41,7 @@ const JoinUs: React.FC = () => (
                 <p className="mb-6">
                     We empower teachers to support their entire classroom. 90% of US teachers who have used Khan Academy have found us effective.
                 </p>
-                <a href="/tutors/auth">
+                <a href="/tutor/auth">
                   <button className="bg-blue-500 text-white font-semibold py-3 px-6 rounded-md hover:bg-blue-600 transition duration-300">
                     Tutors, Start Here
                   </button>
