@@ -1,20 +1,59 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+
+const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+      >
+        <FontAwesomeIcon icon={faInfoCircle} className="text-gray-500 cursor-help" />
+      </div>
+      {isVisible && (
+        <div className="absolute z-10 w-64 px-4 py-2 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-lg -top-2 left-full ml-2">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const PasswordInput: React.FC<{ 
   value: string, 
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, 
-  placeholder: string 
-}> = ({ value, onChange, placeholder }) => (
-  <input
-    type="password"
-    value={value}
-    onChange={onChange}
-    placeholder={placeholder}
-    className="w-full px-4 py-2 mb-4 text-lg border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-    required
-  />
+  placeholder: string,
+  showTooltip?: boolean
+}> = ({ value, onChange, placeholder, showTooltip = false }) => (
+  <div className="relative w-full mb-4">
+    <input
+      type="password"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="w-full px-4 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+      required
+    />
+    {showTooltip && (
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-50">
+        <Tooltip>
+          <h3 className="font-medium text-gray-900">Password Rules:</h3>
+          <ul className="mt-2 list-disc list-inside">
+            <li>At least 8 characters long</li>
+            <li>At least one uppercase letter</li>
+            <li>At least one lowercase letter</li>
+            <li>At least one number</li>
+            <li>At least one special character (!@#$%^&*)</li>
+          </ul>
+        </Tooltip>
+      </div>
+    )}
+  </div>
 );
 
 const ResetPassword: React.FC = () => {
@@ -28,11 +67,30 @@ const ResetPassword: React.FC = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const token = queryParams.get('token');
 
+  const passwordRules = [
+    { rule: /.{8,}/, description: "At least 8 characters long" },
+    { rule: /[A-Z]/, description: "At least one uppercase letter" },
+    { rule: /[a-z]/, description: "At least one lowercase letter" },
+    { rule: /[0-9]/, description: "At least one number" },
+    { rule: /[!@#$%^&*]/, description: "At least one special character (!@#$%^&*)" }
+  ];
+
+  const validatePassword = (password: string) => {
+    return passwordRules.every(({ rule }) => rule.test(password));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');
     setIsError(false);
+
+    if(!validatePassword(newPassword)) {
+      setIsError(true);
+      setMessage('Password does not meet the required criteria');
+      setIsSubmitting(false);
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setIsError(true);
@@ -67,13 +125,14 @@ const ResetPassword: React.FC = () => {
         {/* Left side - Password Reset Form */}
         <div className="absolute top-0 left-0 w-1/2 h-full flex items-center justify-center">
           <div className="w-full max-w-md p-8">
-            <h2 className="text-3xl font-bold text-center mb-8">Reset Password</h2>
+            <h2 className="text-2xl font-bold text-center mb-8">Reset Password</h2>
             <p className="text-center mb-8">Enter your new password below.</p>
             <form onSubmit={handleSubmit} className="w-full max-w-md">
               <PasswordInput 
                 value={newPassword} 
                 onChange={(e) => setNewPassword(e.target.value)} 
                 placeholder="New Password" 
+                showTooltip={true}
               />
               <PasswordInput 
                 value={confirmPassword} 

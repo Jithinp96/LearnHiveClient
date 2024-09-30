@@ -28,8 +28,9 @@ const AuthenticationForm: React.FC = () => {
     password: string
   ) => {
     const response = await registerStudentAPI(name, email, mobile, password);
+    console.log("response for status code changing: ", response?.status);
     
-    if (response?.data.message === "Registration successful. OTP sent to email.") {
+    if (response?.status === 201) {
       navigate("/otp-verify", { state: { registrationType } });
     }
   };
@@ -85,10 +86,10 @@ const AuthenticationForm: React.FC = () => {
                 isSignUp ? "translate-x-0" : "-translate-x-[20%]"
               } transition-transform duration-600 ease-in-out`}
             >
-              <h1 className="text-3xl font-bold m-0">
+              <h1 className="text-2xl font-bold m-0">
                 Back to Building Your Future!
               </h1>
-              <p className="text-lg font-[100] leading-5 tracking-[0.5px] my-5 mx-0">
+              <p className="text-sm font-[100] leading-5 tracking-[0.5px] my-5 mx-0">
                 Login and unlock the next phase of your future.
               </p>
               <button
@@ -103,8 +104,8 @@ const AuthenticationForm: React.FC = () => {
                 isSignUp ? "translate-x-[20%]" : "translate-x-0"
               } transition-transform duration-600 ease-in-out`}
             >
-              <h1 className="text-3xl font-bold m-0">Hello, Future Mind!</h1>
-              <p className="text-lg font-[100] leading-5 tracking-[0.5px] my-5 mx-0">
+              <h1 className="text-2xl font-bold m-0">Hello, Future Mind!</h1>
+              <p className="text-sm font-[100] leading-5 tracking-[0.5px] my-5 mx-0">
                 Step into the future! <br />
                 <br />
                 Share your details and begin your journey as a Future Mind with

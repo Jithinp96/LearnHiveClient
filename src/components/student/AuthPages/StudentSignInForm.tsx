@@ -24,7 +24,7 @@ const StudentSignInForm: React.FC<SignInProps> = ({ onSignIn, errorMessage, load
         <div className="my-5">
           <a href="#" className="border border-solid border-[#DDDDDD] rounded-full inline-flex justify-center items-center m-0 h-10 w-10"><FontAwesomeIcon icon={faGooglePlusG} /></a>
         </div>
-        <span className="text-lg">or use your account</span>
+        <span className="text-sm">or use your account</span>
         <form onSubmit={handleSubmit}>
           <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full" />
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full" />
