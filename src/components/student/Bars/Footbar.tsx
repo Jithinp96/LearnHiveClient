@@ -6,7 +6,7 @@ const Footer: React.FC = () => (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="items-center flex">
                 <img
-                    src="../../src/assets/logo/LogoDark.png"
+                    src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/LogoDark.png"
                     alt="LearnHive Logo"
                     width={200}
                 />

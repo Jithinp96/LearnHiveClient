@@ -9,7 +9,7 @@ const HeroSection: React.FC = () => (
           <p className="text-xl mb-6">World-class education for anyone, anywhere.</p>
         </div>
         <div className="md:w-1/2 flex justify-end">
-          <img src="../src/assets/Images/Banner.png" alt="Students learning" className=""/>
+          <img src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/Images/Banner.png" alt="Students learning" className=""/>
         </div>
       </div>
     </section>
@@ -25,7 +25,7 @@ const JoinUs: React.FC = () => (
                 {/* Left side with images */}
                 <div className="md:w-1/2 relative mb-8 md:mb-0">
                     <img
-                        src="../src/assets/Images/Teacher.png"
+                        src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/Images/Teacher.png"
                         alt="Teacher Image"
                         width={450}
                     />
@@ -72,8 +72,8 @@ const JoinUs: React.FC = () => (
                 {/* Right side with images */}
                 <div className="md:w-1/2 relative mb-8 md:mb-0">
                     <img
-                        src="../src/assets/Images/Student.png"
-                        alt="Teacher Image"
+                        src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/Images/Student.png"
+                        alt="Student Image"
                     />
                 </div>
             </div>

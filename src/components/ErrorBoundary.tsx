@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             return (
                 <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center px-4">
                     <img 
-                        src="../src/assets/Images/error.jpg" 
+                        src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/Images/error.jpg" 
                         alt="Error" 
                         className="max-w-80 h-auto mb-8" 
                     />

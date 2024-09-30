@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Logo */}
-        <img className="h-11" src="../../src/assets/logo/LogoDark.png" alt="Logo" />
+        <img className="h-11" src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/LogoDark.png" alt="Logo" />
 
         {/* Menu Links */}
         <div
