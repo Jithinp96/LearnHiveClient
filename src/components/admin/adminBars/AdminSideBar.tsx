@@ -10,13 +10,13 @@ const AdminSidebar: React.FC = () => {
     { icon: Users, text: 'Students', path: '/admin/students' },
     { icon: SquareUserRound, text: 'Teachers', path: '/admin/tutors' },
     { icon: Book, text: 'Courses Category', path: '/admin/course-categories' },
-    { icon: BookOpenText, text: 'Courses', path: '/admin/courses' },
+    // { icon: BookOpenText, text: 'Courses', path: '/admin/courses' },
   ];
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 p-4">
       <div className="flex items-center mb-8">
-        <img src="../../src/assets/logo/LogoLight.png" alt="Logo" />
+        <img src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/LogoLight.png" alt="Logo" />
       </div>
       <nav>
         {navItems.map((item, index) => (

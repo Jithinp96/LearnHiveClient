@@ -4,7 +4,7 @@ export interface TutorState {
   tutorLoading: boolean;
   tutorError: string | null;
   isTutorAuthenticated: boolean;
-  tutorInfo: { name: string; email: string; tutorId: string; role: string } | null;
+  tutorInfo: { _id: string, name: string; email: string; tutorId: string; role: string, isBlocked: boolean } | null;
 }
 
 const initialState: TutorState = {

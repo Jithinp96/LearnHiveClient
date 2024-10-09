@@ -8,6 +8,9 @@ import TutorAuthPage from "../../pages/tutor/TutorAuthPage";
 import TutorDashboardPage from "../../pages/tutor/TutorDashboardPage";
 import ForgotPasswordPage from "../../pages/tutor/ForgotPasswordPage";
 import ResetPasswordPage from "../../pages/tutor/ResetPasswordPage";
+import ProfilePage from "../../pages/tutor/ProfilePage";
+import CoursePage from "@/pages/tutor/CoursePage";
+import AddNewCoursePage from "@/pages/tutor/AddNewCoursePage";
 
 const TutorRoutes: React.FC = () => {
   return (
@@ -22,6 +25,9 @@ const TutorRoutes: React.FC = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<TutorDashboardPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/course-list" element={<CoursePage />} />
+        <Route path="/add-course" element={<AddNewCoursePage />} />
       </Route>
     </Routes>
   );

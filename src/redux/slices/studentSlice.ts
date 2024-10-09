@@ -4,7 +4,7 @@ export interface StudentState {
     studentLoading: boolean;
     studentError: string | null;
     isStudentAuthenticated: boolean;
-    studentInfo: { name: string; email: string, studentId: string, role: string } | null; 
+    studentInfo: { _id: string, name: string; email: string, studentId: string, mobile: number, role: string, isBlocked: boolean } | null; 
 }
 
 const initialState: StudentState = {

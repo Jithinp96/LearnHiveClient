@@ -12,20 +12,6 @@ import AdminRoutes from "./routes/admin/AdminRoutes";
 import HomePage from "./pages/HomePage";
 
 const App: React.FC = () => {
-  // return (
-  //   <Router>
-  //     <Routes>
-  //       {/* Public Route */}
-  //       <Route path="/" element={<HomePage />} />
-
-  //       {/* Student, Tutor, and Admin Routes */}
-  //       <Route path="/*" element={<StudentRoutes />} />
-  //       <Route path="/tutor/*" element={<TutorRoutes />} />
-  //       <Route path="/admin/*" element={<AdminRoutes />} />
-  //     </Routes>
-  //   </Router>
-  // );
-
   return (
     <Router>
       <Routes>
@@ -38,8 +24,6 @@ const App: React.FC = () => {
             </ErrorBoundary>
           } 
         />
-
-        {/* Student, Tutor, and Admin Routes wrapped with ErrorBoundary */}
         <Route 
           path="/*" 
           element={

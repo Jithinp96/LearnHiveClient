@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { faGooglePlusG } from '@fortawesome/free-brands-svg-icons';
 
 interface SignUpProps {
   onRegister: (name: string, email: string, mobile: number, password: string) => void;
@@ -58,10 +57,10 @@ const StudentRegistrationForm: React.FC<SignUpProps> = ({ onRegister }) => {
       setErrorMessage('Mobile number should be 10 digits');
       return;
     }
-    if(!validatePassword(password)) {
-      setErrorMessage('Password does not meet the required criteria');
-      return;
-    }
+    // if(!validatePassword(password)) {
+    //   setErrorMessage('Password does not meet the required criteria');
+    //   return;
+    // }
     if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match');
       return;
@@ -73,14 +72,8 @@ const StudentRegistrationForm: React.FC<SignUpProps> = ({ onRegister }) => {
 
   return (
     <div className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
-      <img className="h-11" src="../../src/assets/logo/Logo.png" alt="Logo" />
+      <img className="h-11" src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/Logo.png" alt="Logo" />
       <h1 className="font-bold">Student Create Account</h1>
-      <div className="my-2">
-        <a href="#" className="border border-solid border-[#DDDDDD] rounded-full inline-flex justify-center items-center h-10 w-10">
-          <FontAwesomeIcon icon={faGooglePlusG} />
-        </a>
-      </div>
-      <span className="text-sm">or use your account</span>
       <form onSubmit={handleSubmit} className="flex flex-col items-center w-full">
         <input
           type="text"

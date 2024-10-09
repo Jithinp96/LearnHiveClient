@@ -34,7 +34,6 @@ const AdminSignInForm: React.FC = () => {
             }
         } catch (error) {
             console.error('Error during admin login:', error);
-            // setError('Login failed, please check your credentials');
         }
     }
     return (
@@ -42,7 +41,7 @@ const AdminSignInForm: React.FC = () => {
           <div className={`bg-white rounded-[10px] shadow-[0_14px_28px_rgba(0,0,0,0.25),0_10px_10px_rgba(0,0,0,0.22)] relative overflow-hidden w-[400px] max-w-full min-h-[600px]`}>
             <div className={`absolute top-0 h-full`}>
                 <div className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
-                    <img className='h-16' src="../../src/assets/logo/Logo.png" alt="Logo" />
+                    <img className='h-16' src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/Logo.png" alt="Logo" />
                     <h1 className="text-4xl font-bold m-4">Admin Sign In</h1>
                     <form onSubmit={handleSubmit}>
                         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full" />

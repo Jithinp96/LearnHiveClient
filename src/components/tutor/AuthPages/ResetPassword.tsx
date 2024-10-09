@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { tutorResetPasswordAPI } from '../../../api/tutorAPI/tutorAxios';
 
 const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -100,16 +101,14 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/tutor/reset-password?token=${token}`, {
-        newPassword: newPassword,
-      });
+      const response = await tutorResetPasswordAPI(newPassword, token);
 
-      if (response.status >= 200 && response.status < 300) {
+      if (response && response?.status >= 200 && response?.status < 300) {
         setMessage('Password reset successful. You will be redirected to login in 3 seconds!');
         setTimeout(() => navigate('/tutor/auth'), 3000);
       } else {
         setIsError(true);
-        setMessage(response.data.message || 'An unexpected error occurred');
+        setMessage(response?.data.message || 'An unexpected error occurred');
       }
     } catch (error) {
       setIsError(true);

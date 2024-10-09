@@ -62,7 +62,7 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
   const [isResendDisabled, setIsResendDisabled] = useState(false);
 
   const navigate = useNavigate()
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     startTimer();
@@ -105,8 +105,6 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
         },{
           withCredentials: true
         })
-
-        console.log("Response: ", response);
         
         if (response.status >= 200 && response.status < 300) {
           
@@ -151,7 +149,7 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
   
       if (response.status >= 200 && response.status < 300) {
         console.log('OTP resent successfully');
-        startTimer(); // Restart the timer when OTP is resent
+        startTimer();
       } else {
         console.error('Failed to resend OTP:', response.data.message);
         setErrorMessage(response.data.message || 'Failed to resend OTP');

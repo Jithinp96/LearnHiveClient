@@ -9,6 +9,7 @@ import OTPPage from "../../pages/student/OTPPage";
 import ForgotPasswordPage from "../../pages/student/ForgotPasswordPage";
 import DashboardPage from "../../pages/student/DashboardPage";
 import ResetPasswordPage from "../../pages/student/ResetPassowordPage";
+import ProfilePage from "../../pages/student/ProfilePage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -24,6 +25,8 @@ const StudentRoutes: React.FC = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        
       </Route>
     </Routes>
   );

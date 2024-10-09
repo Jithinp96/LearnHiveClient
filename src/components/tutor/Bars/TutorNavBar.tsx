@@ -24,7 +24,7 @@ const TutorNavbar : React.FC = () => {
 
   const handleLogout = async () => {
     
-    const response = await logoutTutorAPI('student')
+    const response = await logoutTutorAPI('tutor')
     console.log(response);
     
     dispatch(logoutTutor());
@@ -87,7 +87,7 @@ const TutorNavbar : React.FC = () => {
                 <ul>
                   <li
                     className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/tutor/profile')}
                   >
                     Profile
                   </li>

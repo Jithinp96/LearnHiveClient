@@ -62,7 +62,7 @@ const AdminStudentDetails: React.FC = () => {
     
 
     if (loading) {
-        return <div>Loading student details...</div>;
+        return <div>Loading profile...</div>;
     }
 
     if (error) {
@@ -70,7 +70,7 @@ const AdminStudentDetails: React.FC = () => {
     }
 
     if (!studentDetails) {
-        return <div>No student details found</div>;
+        return <div>No details found</div>;
     }
 
     const stats: Stat[] = [

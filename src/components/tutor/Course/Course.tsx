@@ -1,24 +1,5 @@
 import React from "react";
 
-interface FileCardProps {
-    title: string;
-    icon: React.ReactNode;
-    fileCount: number;
-    bgColor: string;
-}
-  
-const FileCard: React.FC<FileCardProps> = ({ title, icon, fileCount, bgColor }) => (
-    <div className={`p-4 rounded-lg ${bgColor}`}>
-        <div className="flex justify-between items-center mb-2">
-            <div className="text-2xl">{icon}</div>
-        </div>
-        <h3 className="font-semibold">{title}</h3>
-        <div className="flex justify-between mt-2">
-            <span>{fileCount} Files</span>
-        </div>
-    </div>
-);
-
 interface TaskRowProps {
     subject: string;
     task: string;
@@ -50,26 +31,19 @@ const TaskRow: React.FC<TaskRowProps> = ({ subject, task, submitted, status }) =
     );
 };
 
-const TutorDashboard: React.FC = () => {
+const Course: React.FC = () => {
     return (
         <>
             <div className="p-6 bg-gray-100 min-h-screen">
                 <div className="max-w-7xl mx-auto">
                     <header className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">Courses</h1>
+                            <a href="/tutor/add-course">
+                                <button>Add New Course</button>
+                            </a>
                     </header>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <FileCard title="Total Courses" icon="📄" fileCount={112} bgColor="bg-purple-100" />
-                        <FileCard title="Students Enrolled" icon="🖼️" fileCount={112} bgColor="bg-green-100" />
-                        <FileCard title="Total Income" icon="₹" fileCount={112} bgColor="bg-red-100" />
-                    </div>
-
                     <div className="mt-8 bg-white p-6 rounded-lg shadow">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-semibold">My Courses</h2>
-                            <a href="/tutor/course-list" className="text-blue-600 hover:underline">View All</a>
-                        </div>
                         <table className="w-full">
                             <thead>
                                 <tr className="text-left text-gray-600">
@@ -120,4 +94,4 @@ const TutorDashboard: React.FC = () => {
     )
 }
 
-export default TutorDashboard
+export default Course

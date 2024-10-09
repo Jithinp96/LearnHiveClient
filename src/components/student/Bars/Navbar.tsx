@@ -57,7 +57,7 @@ const Navbar: React.FC = () => {
             isOpen ? 'block' : 'hidden'
           }`}
         >
-          <a href="/dashboard" className="block text-white px-4 py-2 md:inline">
+          <a href="/" className="block text-white px-4 py-2 md:inline">
             Home
           </a>
           <a href="#" className="block text-white px-4 py-2 md:inline">

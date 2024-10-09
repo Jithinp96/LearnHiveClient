@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { tutorForgotPasswordAPI } from '../../../api/tutorAPI/tutorAxios';
 
 const EmailInput: React.FC<{ onSubmit: (email: string) => void }> = ({ onSubmit }) => {
     const [email, setEmail] = useState('');
@@ -43,18 +44,14 @@ const ForgotPassword: React.FC = () => {
         setIsError(false);
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/tutor/forgot-password`, {
-            email: email
-        }, {
-            withCredentials: true
-        });
+            const response = await tutorForgotPasswordAPI(email);
 
-        if (response.status >= 200 && response.status < 300) {
-            setMessage('Password reset link sent to your email.');
-        } else {
-            setIsError(true);
-            setMessage(response.data.message || 'An unexpected error occurred');
-        }
+            if (response && response.status >= 200 && response.status < 300) {
+                setMessage('Password reset link sent to your email.');
+            } else {
+                setIsError(true);
+                setMessage(response?.data.message || 'An unexpected error occurred');
+            }
         } catch (error) {
             setIsError(true);
             if (axios.isAxiosError(error)) {
