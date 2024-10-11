@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
           <a href="/" className="block text-white px-4 py-2 md:inline">
             Home
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
+          <a href="/allcourses" className="block text-white px-4 py-2 md:inline">
             Courses
           </a>
           <a href="#" className="block text-white px-4 py-2 md:inline">

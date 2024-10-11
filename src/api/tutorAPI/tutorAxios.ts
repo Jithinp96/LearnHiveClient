@@ -102,7 +102,10 @@ export const addCourseAPI = async (
     tags: string[],
     category: string,
     price: number,
-    videos: object[]
+    level: string,
+    thumbnailUrl: string,
+    duration: number,
+    videos: object[],
 ) => {
     try {
         return await axiosInstance.post(`/tutor/${tutorId}/add-course`, {
@@ -112,6 +115,9 @@ export const addCourseAPI = async (
             tags,
             category,
             price,
+            level,
+            thumbnailUrl,
+            duration,
             videos,
         });
     } catch (error) {
@@ -127,8 +133,8 @@ export const uploadVideoAPI = async (file: File) => {
         formData.append("video", file);
 
         const response = await axiosInstance.post("/tutor/upload-video", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
+            headers: { "Content-Type": "multipart/form-data" },
+        });
 
     return response.data;
     } catch (error) {
@@ -137,11 +143,45 @@ export const uploadVideoAPI = async (file: File) => {
     }
 };
 
+export const uploadThumbnailAPI = async(file: File) => {
+    try {
+        console.log("Reached uploadThumbnailAPI");
+        console.log("Starting thumbnail upload for file: ", file.name);
+        const formData = new FormData();
+        formData.append("image", file);
+        console.log("formData: ", formData);
+        console.log("formData keys: ", Array.from(formData.keys()));
+
+        const response = await axiosInstance.post("/tutor/upload-thumbnail", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log("Response: ", response);
+        
+    return response.data;
+    } catch (error) {
+        console.error("Error uploading thumbnail:", error);
+        throw error;
+    }
+}
+
 export const fetchCategoriesAPI = async() => {
     try {
         const response = await axiosInstance.get('/tutor/getcategories');
         return response;
     } catch (error) {
-        
+        console.error("Error in loading course categories:", error);
+        throw error;
+    }
+}
+
+export const fetchTutorCoursesAPI = async(id: string) => {
+    try {
+        const response = await axiosInstance.get('/tutor/course-list', {
+            params: { id }
+        });
+        return response
+    } catch (error) {
+        console.error("Error in loading course list:", error);
+        throw error;
     }
 }

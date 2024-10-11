@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusCircle, X } from 'lucide-react';
-import { addCourseAPI, uploadVideoAPI, fetchCategoriesAPI } from '@/api/tutorAPI/tutorAxios';
+import { addCourseAPI, uploadVideoAPI, uploadThumbnailAPI, fetchCategoriesAPI } from '@/api/tutorAPI/tutorAxios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useNavigate } from 'react-router-dom';
@@ -19,11 +19,26 @@ interface CourseInput {
   category: string;
   price: number;
   videos: VideoInput[];
+  level: string;
+  thumbnail: File | null;
+  duration: number;
 }
 
 interface Category {
   _id: string;
   name: string;
+}
+
+interface FormErrors {
+  title?: string;
+  description?: string;
+  tags?: string;
+  category?: string;
+  price?: string;
+  videos?: string[];
+  level?: string;
+  thumbnail?: string;
+  duration?: string;
 }
 
 const AddNewCourse: React.FC = () => {
@@ -34,7 +49,11 @@ const AddNewCourse: React.FC = () => {
     category: '',
     price: 0,
     videos: [],
+    level: '',
+    thumbnail: null,
+    duration: 0,
   });
+  const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
   const { tutorInfo } = useSelector((state: RootState) => state.tutor);
 
@@ -42,13 +61,12 @@ const AddNewCourse: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await fetchCategoriesAPI();
-        console.log("fetchedCategories: ", fetchedCategories?.data);
-        
         setCategories(fetchedCategories?.data);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -60,6 +78,7 @@ const AddNewCourse: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCourse({ ...course, [name]: value });
+    setErrors(prev => ({ ...prev, [name]: undefined }));
   };
 
   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +97,7 @@ const AddNewCourse: React.FC = () => {
     if (newTag && !course.tags.includes(newTag)) {
       setCourse({ ...course, tags: [...course.tags, newTag] });
       setTagInput('');
+      setErrors(prev => ({ ...prev, tags: undefined }));
     }
   };
 
@@ -97,14 +117,41 @@ const AddNewCourse: React.FC = () => {
       i === index ? { ...video, [field]: value } : video
     );
     setCourse({ ...course, videos: updatedVideos });
+    setErrors(prev => {
+      const newVideoErrors = [...(prev.videos || [])];
+      newVideoErrors[index] = '';
+      return { ...prev, videos: newVideoErrors };
+    });
   };
 
   const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
-    handleVideoChange(index, 'file', file);
+    if (file && !file.type.startsWith('video/')) {
+      setErrors(prev => {
+        const newVideoErrors = [...(prev.videos || [])];
+        newVideoErrors[index] = 'Please select only video files.';
+        return { ...prev, videos: newVideoErrors };
+      });
+    } else {
+      handleVideoChange(index, 'file', file);
+    }
   
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file && !file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, thumbnail: 'Please select only image files.' }));
+    } else {
+      setCourse({ ...course, thumbnail: file });
+      setErrors(prev => ({ ...prev, thumbnail: undefined }));
+    }
+  
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = '';
     }
   };
 
@@ -113,19 +160,41 @@ const AddNewCourse: React.FC = () => {
     setCourse({ ...course, videos: updatedVideos });
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!course.title.trim()) newErrors.title = 'Title is required';
+    if (course.description.trim().split(/\s+/).length < 30) newErrors.description = 'Description should be at least 30 words';
+    if (course.tags.length === 0) newErrors.tags = 'At least one tag is required';
+    if (!course.category) newErrors.category = 'Category is required';
+    if (course.price <= 0) newErrors.price = 'Price should be a non-zero positive number';
+    if (!course.level) newErrors.level = 'Level is required';
+    if (!course.thumbnail) newErrors.thumbnail = 'Thumbnail is required';
+    if (course.duration <= 0) newErrors.duration = 'Duration should be a non-zero positive number';
+
+    const videoErrors: string[] = [];
+    course.videos.forEach((video, index) => {
+      if (!video.title.trim()) videoErrors[index] = 'Video title is required';
+      if (!video.description.trim()) videoErrors[index] = 'Video description is required';
+      if (!video.file) videoErrors[index] = 'Video file is required';
+    });
+
+    if (videoErrors.length > 0) newErrors.videos = videoErrors;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setIsUploading(true);
     try {
-
       const uploadedVideos = await Promise.all(course.videos.map(async (video) => {
-        console.log("video.file in addCoure.tsx: ", video.file);
-        
         if (video.file) {
           try {
             const videoData = await uploadVideoAPI(video.file);
-            console.log("videoData in addCoure.tsx: ", videoData);
-            
             return {
               title: video.title,
               description: video.description,
@@ -137,10 +206,22 @@ const AddNewCourse: React.FC = () => {
           }
         }
         return null; 
-      }));      
+      }));
 
-    
-    const validVideos = uploadedVideos.filter((video) => video !== null);
+      let thumbnailUrl = '';
+      if (course.thumbnail) {
+        try {
+          const thumbnailData = await uploadThumbnailAPI(course.thumbnail);
+          thumbnailUrl = thumbnailData.url;
+        } catch (error) {
+          console.error('Error uploading thumbnail:', error);
+          setErrors(prev => ({ ...prev, thumbnail: 'Failed to upload thumbnail' }));
+          setIsUploading(false);
+          return;
+        }
+      }
+
+      const validVideos = uploadedVideos.filter((video) => video !== null);
 
       const response = await addCourseAPI(
         tutorInfo?._id ?? '',
@@ -149,7 +230,10 @@ const AddNewCourse: React.FC = () => {
         course.tags,
         course.category,
         course.price,
-        validVideos,
+        course.level,
+        thumbnailUrl,
+        course.duration,
+        validVideos
       );
 
       if (response.status === 201) {
@@ -160,8 +244,11 @@ const AddNewCourse: React.FC = () => {
       }
     } catch (error) {
       console.error('Error adding course:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
+
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -182,8 +269,8 @@ const AddNewCourse: React.FC = () => {
               value={course.title}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
+            {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
           </div>
 
           <div className="mb-4">
@@ -197,8 +284,8 @@ const AddNewCourse: React.FC = () => {
               onChange={handleInputChange}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             ></textarea>
+            {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
           </div>
 
           <div className="mb-4">
@@ -233,6 +320,7 @@ const AddNewCourse: React.FC = () => {
                 Add
               </button>
             </div>
+            {errors.tags && <p className="mt-1 text-xs text-red-500">{errors.tags}</p>}
           </div>
           <div className="mb-4">
             <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
@@ -244,7 +332,6 @@ const AddNewCourse: React.FC = () => {
               value={course.category}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             >
               <option value="" disabled>Select a category</option>
               {categories.map((category) => (
@@ -253,6 +340,7 @@ const AddNewCourse: React.FC = () => {
                 </option>
               ))}
             </select>
+            {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
           </div>
 
           <div className="mb-4">
@@ -268,8 +356,65 @@ const AddNewCourse: React.FC = () => {
               min="0"
               step="0.01"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
+            {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price}</p>}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+              Course Level
+            </label>
+            <select
+              id="level"
+              name="level"
+              value={course.level}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>Select a level</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="expert">Expert</option>
+            </select>
+            {errors.level && <p className="mt-1 text-xs text-red-500">{errors.level}</p>}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
+              Course Thumbnail
+            </label>
+            <input
+              type="file"
+              id="thumbnail"
+              name="thumbnail"
+              accept="image/*"
+              onChange={handleThumbnailChange}
+              ref={thumbnailInputRef}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {course.thumbnail && (
+              <p className="mt-1 text-sm text-gray-600">
+                Selected file: {course.thumbnail.name}
+              </p>
+            )}
+            {errors.thumbnail && <p className="mt-1 text-xs text-red-500">{errors.thumbnail}</p>}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+              Course Duration (hours)
+            </label>
+            <input
+              type="number"
+              id="duration"
+              name="duration"
+              value={course.duration}
+              onChange={handleInputChange}
+              min="0"
+              step="0.5"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.duration && <p className="mt-1 text-xs text-red-500">{errors.duration}</p>}
           </div>
 
           <div className="mb-4">
@@ -292,27 +437,27 @@ const AddNewCourse: React.FC = () => {
                   value={video.title}
                   onChange={(e) => handleVideoChange(index, 'title', e.target.value)}
                   className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
                 />
                 <textarea
                   placeholder="Video Description"
                   value={video.description}
                   onChange={(e) => handleVideoChange(index, 'description', e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
                 ></textarea>
                 <input
                   type="file"
                   accept="video/*"
                   onChange={(e) => handleFileChange(index, e)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
                 />
                 {video.file && (
                   <p className="mt-1 text-sm text-gray-600">
                     Selected file: {video.file.name}
                   </p>
+                )}
+                {errors.videos && errors.videos[index] && (
+                  <p className="mt-1 text-xs text-red-500">{errors.videos[index]}</p>
                 )}
               </div>
             ))}

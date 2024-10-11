@@ -10,6 +10,7 @@ import ForgotPasswordPage from "../../pages/student/ForgotPasswordPage";
 import DashboardPage from "../../pages/student/DashboardPage";
 import ResetPasswordPage from "../../pages/student/ResetPassowordPage";
 import ProfilePage from "../../pages/student/ProfilePage";
+import AllCourseListPage from "@/pages/student/AllCourseListPage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const StudentRoutes: React.FC = () => {
         <Route path="/otp-verify" element={<OTPPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/allcourses" element={<AllCourseListPage />} />
       </Route>
 
       {/* Protected Routes */}

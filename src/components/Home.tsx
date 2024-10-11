@@ -1,4 +1,5 @@
 import React from "react"
+import { Book, Users, Star } from 'lucide-react';
 
 const HeroSection: React.FC = () => (
     <section className="bg-blue-50">
@@ -113,7 +114,27 @@ const BenefitsSection: React.FC = () => (
           />
         </div>
       </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-purple-100 p-6 rounded-lg shadow-sm">
+              <Book className="w-12 h-12 text-purple-600 mb-4" />
+              <h3 className="text-xl font-semibold text-purple-800 mb-2">Diverse Course Catalog</h3>
+              <p className="text-purple-600">Explore a wide range of subjects taught by industry experts</p>
+            </div>
+            <div className="bg-yellow-100 p-6 rounded-lg shadow-sm">
+              <Users className="w-12 h-12 text-yellow-600 mb-4" />
+              <h3 className="text-xl font-semibold text-yellow-800 mb-2">Interactive Learning</h3>
+              <p className="text-yellow-600">Engage with instructors and peers in our vibrant community</p>
+            </div>
+            <div className="bg-green-100 p-6 rounded-lg shadow-sm">
+              <Star className="w-12 h-12 text-green-600 mb-4" />
+              <h3 className="text-xl font-semibold text-green-800 mb-2">Self-Paced Learning</h3>
+              <p className="text-green-600">Learn at your own pace with flexible course schedules</p>
+            </div>
+          </div>
+        </div>
     </section>
+    
 );
   
 const CourseSection: React.FC = () => (
