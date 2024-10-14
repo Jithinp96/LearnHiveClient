@@ -15,6 +15,7 @@ interface VideoInput {
 interface CourseInput {
   title: string;
   description: string;
+  shortDescription: string;
   tags: string[];
   category: string;
   price: number;
@@ -32,6 +33,7 @@ interface Category {
 interface FormErrors {
   title?: string;
   description?: string;
+  shortDescription?: string;
   tags?: string;
   category?: string;
   price?: string;
@@ -45,6 +47,7 @@ const AddNewCourse: React.FC = () => {
   const [course, setCourse] = useState<CourseInput>({
     title: '',
     description: '',
+    shortDescription: '',
     tags: [],
     category: '',
     price: 0,
@@ -164,6 +167,7 @@ const AddNewCourse: React.FC = () => {
     const newErrors: FormErrors = {};
 
     if (!course.title.trim()) newErrors.title = 'Title is required';
+    if (!course.shortDescription.trim()) newErrors.shortDescription = 'Short description about the course is required';
     if (course.description.trim().split(/\s+/).length < 30) newErrors.description = 'Description should be at least 30 words';
     if (course.tags.length === 0) newErrors.tags = 'At least one tag is required';
     if (!course.category) newErrors.category = 'Category is required';
@@ -227,6 +231,7 @@ const AddNewCourse: React.FC = () => {
         tutorInfo?._id ?? '',
         course.title,
         course.description,
+        course.shortDescription,
         course.tags,
         course.category,
         course.price,
@@ -274,8 +279,21 @@ const AddNewCourse: React.FC = () => {
           </div>
 
           <div className="mb-4">
+            <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700 mb-1">
+              Short Course Description
+            </label>
+            <input
+              id="shortDescription"
+              name="shortDescription"
+              value={course.shortDescription}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></input>
+            {errors.shortDescription && <p className="mt-1 text-xs text-red-500">{errors.shortDescription}</p>}
+          </div>
+          <div className="mb-4">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Course Description
+              Detailed Course Description
             </label>
             <textarea
               id="description"

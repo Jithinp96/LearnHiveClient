@@ -3,40 +3,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { fetchTutorCoursesAPI } from '@/api/tutorAPI/tutorAxios';
 
+interface Category {
+    name: string
+}
+
 interface Course {
     _id: string;
     title: string;
-    category: string;
+    category: Category;
     createdAt: string;
-    status: 'Published' | 'Draft' | 'Under Review';
+    isBlocked: boolean;
 }
-
-const CourseRow: React.FC<Course> = ({ title, category, createdAt, status }) => {
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'Published': return 'bg-green-100 text-green-800';
-            case 'Draft': return 'bg-yellow-100 text-yellow-800';
-            case 'Under Review': return 'bg-blue-100 text-blue-800';
-            default: return '';
-        }
-    };
-
-    return (
-        <tr className="border-b border-gray-200">
-            <td className="py-2 text-blue-600">{title}</td>
-            <td>{category}</td>
-            <td>{new Date(createdAt).toLocaleDateString()}</td>
-            <td>
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
-                    {status}
-                </span>
-            </td>
-            <td>
-                <button className="text-blue-600 hover:text-blue-800">Edit</button>
-            </td>
-        </tr>
-    );
-};
 
 const Course: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
@@ -49,7 +26,7 @@ const Course: React.FC = () => {
             try {
                 setIsLoading(true);
                 const fetchedCourses = await fetchTutorCoursesAPI(tutorInfo?._id);
-                console.log("fetchedCourses in course.tsx: ", fetchedCourses);
+                console.log("fetchedCourses in course.tsx: ", fetchedCourses.data);
                 
                 setCourses(fetchedCourses.data);
                 setIsLoading(false);
@@ -61,6 +38,14 @@ const Course: React.FC = () => {
 
         fetchCourses();
     }, [tutorInfo?._id]);
+
+    const getStatusColor = (status: boolean) => {
+        switch (status) {
+            case false: return 'bg-green-100 px-2 py-1 rounded-full text-xs font-semibold';
+            case true: return 'bg-yellow-100 text-yellow-800';
+            default: return '';
+        }
+    };
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -94,7 +79,17 @@ const Course: React.FC = () => {
                             </thead>
                             <tbody>
                                 {courses.map((course) => (
-                                    <CourseRow key={course._id} {...course} />
+                                    <tr key={course._id} className="border-b border-gray-200">
+                                        <td className="py-2 text-blue-600">{course.title}</td>
+                                        <td>{course.category.name}</td>
+                                        <td>{new Date(course.createdAt).toLocaleDateString()}</td>
+                                        <td className={getStatusColor(course.isBlocked)}>
+                                            {course.isBlocked ? 'Blocked' : 'Active'}
+                                        </td>
+                                        <td>
+                                            <button className="text-blue-600 hover:text-blue-800">Edit</button>
+                                        </td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>

@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Home, User, Wallet, BarChart2, ListTodo, Settings, HelpCircle } from 'lucide-react';
+import { getDashboardAPI } from '@/api/studentAPI/studentAPI';
 
-const skills = [
-    { name: 'Web Development', icon: '💻', students: '1 million' },
-    { name: 'WordPress', icon: 'W', students: '3 million' },
-    { name: 'Graphic Design', icon: '🎨', students: '2 million' },
-    { name: 'IOS Dev', icon: 'A', students: '1 million' },
-];
+interface Skill {
+    name: string;
+    // icon: string;
+    // students: string;
+  }
   
 const courses = [
     { name: 'HTML', progress: 80, icon: '5', color: 'bg-green-600' },
@@ -14,16 +14,16 @@ const courses = [
     { name: 'JavaScript', progress: 80, icon: 'JS', color: 'bg-blue-500' },
 ];
 
-const SkillCard = ({ name, icon, students }: { name: string; icon: string; students: string }) => (
+const SkillCard = ({ name }: { name: string }) => (
     <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="text-4xl mb-2">{icon}</div>
-        <h3 className="text-xl font-bold mb-2">{name}</h3>
-        <p className="text-sm text-gray-600 mb-4">Join Over {students} Students.</p>
-        <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-            Get Started
-        </button>
+      {/* <div className="text-4xl mb-2">{icon}</div> */}
+      <h3 className="text-xl font-bold mb-2">{name}</h3>
+      {/* <p className="text-sm text-gray-600 mb-4">Join Over {students} Students.</p> */}
+      <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+        Get Started
+      </button>
     </div>
-);
+  );
   
 const CourseCard = ({ name, progress, icon, color }: { name: string; progress: number; icon: string; color: string }) => (
     <div className="bg-white p-4 rounded-lg shadow-md flex items-center">
@@ -44,6 +44,23 @@ const CourseCard = ({ name, progress, icon, color }: { name: string; progress: n
 );
 
 const StudentDashboard : React.FC = () => {
+
+    const [skills, setSkills] = useState<Skill[]>([]);
+  
+    // Fetch categories from the backend
+    useEffect(() => {
+        const fetchSkills = async () => {
+        try {
+            const response = await getDashboardAPI()
+            setSkills(response?.data.categories);
+        } catch (error) {
+            console.error('Error fetching skills:', error);
+        }
+        };
+
+        fetchSkills();
+    }, []);
+
     return(
         <>
             <div className="flex bg-gray-100 min-h-screen">
@@ -51,7 +68,7 @@ const StudentDashboard : React.FC = () => {
                     <h2 className="text-2xl font-bold mb-6">Skills</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         {skills.map((skill) => (
-                            <SkillCard key={skill.name} {...skill} />
+                        <SkillCard key={skill.name} {...skill} />
                         ))}
                     </div>
                     <h2 className="text-2xl font-bold mb-6">My Courses</h2>

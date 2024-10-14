@@ -168,7 +168,6 @@ const AdminCourseCategoryList: React.FC = () => {
                     <thead>
                         <tr className="border-b border-gray-200 text-left text-sm font-medium text-gray-500">
                             <th className="py-3 pl-4">Name</th>
-                            <th className="py-3">No of Courses</th>
                             <th className="py-3">Status</th>
                             <th className="py-3">Actions</th>
                         </tr>
@@ -177,7 +176,6 @@ const AdminCourseCategoryList: React.FC = () => {
                         {categories.map((category) => (
                             <tr key={category._id} className="border-b border-gray-200">
                                 <td className="py-4 pl-4">{category.name}</td>
-                                <td className="py-4">{category.coursesCount}</td>
                                 <td className="py-4">
                                     
                                     <StatusToggle

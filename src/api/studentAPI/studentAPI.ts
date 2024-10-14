@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 
 export const registerStudentAPI=async (name: string, email: string, mobile: number, password: string )=>{
     try{
@@ -49,6 +50,9 @@ export const logoutStudentAPI = async (role: string) => {
 export const getStudentDetailsAPI = async (id: string) => {
     return await axios.get(
         `${import.meta.env.VITE_API_URL}/students/profile/${id}`,
+        {
+            withCredentials: true,
+        }
     )
 }
 
@@ -75,5 +79,42 @@ export const editStudentEducationAPI = async() => {
         
     } catch (error) {
         
+    }
+}
+
+export const fetchAllCoursesAPI = async() => {
+    try {
+        return await axiosInstance.get('/students/allcourses', 
+            {
+                withCredentials: true,
+            }
+        )
+    } catch (error) {
+        console.error("Error in fetching courses:", error);
+    }
+}
+
+export const fetchCoursesDetailsAPI = async (courseId: string) => {
+    try {
+        return await axiosInstance.get(`/students/course/${courseId}`,
+        {
+            withCredentials:true
+        })
+    } catch (error) {
+        console.error("Error in fetching course details:", error);
+    }
+}
+
+export const getDashboardAPI = async () => {
+    try {
+        console.log("reached getDashboadAPI in student apio");
+        
+        return await axiosInstance.get(`/students/dashboard`,
+            {
+                withCredentials:true
+            }
+        )
+    } catch (error) {
+        console.error("Error in loading dashboard:", error);
     }
 }

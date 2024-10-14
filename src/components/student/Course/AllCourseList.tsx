@@ -1,97 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Clock, Star, Menu, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
+import { fetchAllCoursesAPI } from '@/api/studentAPI/studentAPI';
+
+interface Category {
+    _id: string;
+    name: string;
+}
 
 interface Course {
-    id: number;
+    _id: string;
     title: string;
-    category: string;
+    category: Category;
     level: string;
     duration: number;
     rating: number;
-    reviews: number;
+    reviews: { rating: number }[];
     price: number;
-    image: string;
+    thumbnailUrl: string;
 }
 
-const courses: Course[] = [
-    {
-        id: 1,
-        title: 'Marketing Channel Strategy & B2B2C Routes to Market',
-        category: 'MARKETING',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 19.99,
-        image: '/api/placeholder/400/300'
-    },
-    {
-        id: 2,
-        title: 'Programming Foundations: JavaScript, HTML and CSS',
-        category: 'PROGRAMMING',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 14.99,
-        image: '/api/placeholder/400/300'
-    },
-    {
-        id: 3,
-        title: 'Introduction to Computer Science and Programming',
-        category: 'COMPUTER SCIENCE',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 29.99,
-        image: '/api/placeholder/400/300'
-    },
-    {
-        id: 4,
-        title: 'Java Programming: Principles of Software Design',
-        category: 'BUSINESS',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 29.99,
-        image: '/api/placeholder/400/300'
-    },
-    {
-        id: 5,
-        title: 'Introduction to Computer Science and Programming',
-        category: 'PROGRAMMING',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 12.29,
-        image: '/api/placeholder/400/300'
-    },
-    {
-        id: 6,
-        title: 'Foundations of User Experience (UX) Design',
-        category: 'DESIGN',
-        level: 'Beginner',
-        duration: 120,
-        rating: 3.5,
-        reviews: 3,
-        price: 15.89,
-        image: '/api/placeholder/400/300'
-    },
-];
-
-const categories = ['Programming', 'Marketing', 'Design', 'Development', 'Business', 'IT & Software', 'Engineering', 'Computer Science'];
-const levels = ['All Course', 'Beginner', 'Intermediate', 'Expert'];
-const prices = ['All', 'Free', 'Paid'];
-
 const AllCourseList: React.FC = () => {
+    const [courses, setCourses] = useState<Course[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await fetchAllCoursesAPI();
+                console.log(response?.data);
+                
+                setCourses(response?.data);
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+            }
+        };
+
+        fetchCourses();
+    }, []);
 
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const handleViewCourse = (courseId: string) => {
+        navigate(`/course/${courseId}`);
     };
 
     return (
@@ -106,33 +62,33 @@ const AllCourseList: React.FC = () => {
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h2 className="text-xl font-semibold mb-4">Category</h2>
                             <ul className="space-y-2">
-                                {categories.map((category) => (
-                                    <li key={category} className="flex items-center">
-                                        <input type="checkbox" id={category} className="mr-2" />
-                                        <label htmlFor={category}>{category}</label>
+                                {courses.map((course) => (
+                                    <li key={course.category._id} className="flex items-center">
+                                        <input type="checkbox" id={course.category._id} className="mr-2" />
+                                        <label htmlFor={course.category.name}>{course.category.name}</label>
                                     </li>
                                 ))}
                             </ul>
 
                             <h2 className="text-xl font-semibold mt-6 mb-4">Level</h2>
                             <ul className="space-y-2">
-                                {levels.map((level) => (
-                                    <li key={level} className="flex items-center">
-                                        <input type="checkbox" id={level} className="mr-2" />
-                                        <label htmlFor={level}>{level}</label>
+                                {courses.map((course) => (
+                                    <li key={course.level} className="flex items-center">
+                                        <input type="checkbox" id={course.level} className="mr-2" />
+                                        <label htmlFor={course.level}>{course.level}</label>
                                     </li>
                                 ))}
                             </ul>
 
-                            <h2 className="text-xl font-semibold mt-6 mb-4">Price</h2>
+                            {/* <h2 className="text-xl font-semibold mt-6 mb-4">Price</h2>
                             <ul className="space-y-2">
-                                {prices.map((price) => (
-                                    <li key={price} className="flex items-center">
-                                        <input type="checkbox" id={price} className="mr-2" />
-                                        <label htmlFor={price}>{price}</label>
+                                {courses.map((course) => (
+                                    <li key={course.price} className="flex items-center">
+                                        <input type="checkbox" id={course.price} className="mr-2" />
+                                        <label htmlFor={course.price}>{course.price}</label>
                                     </li>
                                 ))}
-                            </ul>
+                            </ul> */}
                         </div>
                     </div>
                 </div>
@@ -145,29 +101,13 @@ const AllCourseList: React.FC = () => {
                             <Menu size={24} />
                         </Button>
                     </div>
-                    <p className="text-gray-600 mb-6">
-                        Egestas sed tempus urna et pharetra. Leo integer malesuada nunc vel.
-                        Libero id faucibus nisl tincidunt eget nullam non nisi. Faucibus turpis in
-                        eu mi bibendum neque egestas
-                    </p>
-
-                    <div className="flex mb-6">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="flex-grow border border-gray-300 rounded-l-md p-2"
-                        />
-                        <Button className="bg-gray-800 text-white px-4 py-2 rounded-r-md">
-                            Search
-                        </Button>
-                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses.map((course) => (
-                            <div key={course.id} className="border rounded-lg overflow-hidden flex flex-col">
-                                <img src={course.image} alt={course.title} className="w-full h-48 object-cover" />
+                            <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
+                                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-48 object-cover" />
                                 <div className="p-4 flex-grow">
-                                    <span className="text-xs font-semibold text-gray-500">{course.category}</span>
+                                    <span className="text-xs font-semibold text-gray-500">{course.category.name}</span>
                                     <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
                                     <div className="flex items-center text-sm text-gray-600 mb-2">
                                         <span className="mr-4">{course.level}</span>
@@ -176,14 +116,17 @@ const AllCourseList: React.FC = () => {
                                     </div>
                                     <div className="flex items-center text-sm">
                                         <Star size={16} className="text-yellow-500 mr-1" />
-                                        <span>{course.rating} ({course.reviews} reviews)</span>
+                                        <span>{course.rating || 'No rating yet'} ({course.reviews.length} reviews)</span>
                                     </div>
                                 </div>
                                 <div className="p-4 flex justify-between items-center bg-gray-100">
                                     <span className="font-bold text-xl">
-                                        ${course.price.toFixed(2)}
+                                        ₹{course.price.toFixed(2)}
                                     </span>
-                                    <Button className="bg-yellow-500 text-white px-4 py-2 rounded">
+                                    <Button 
+                                        className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                        onClick={() => handleViewCourse(course._id)}
+                                    >
                                         View Course
                                     </Button>
                                 </div>
