@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
-import { editStudentEducationAPI, getStudentDetailsAPI, updateStudentEducationAPI } from '../../../api/studentAPI/studentAPI';
+import { editStudentEducationAPI, getStudentDetailsAPI, addStudentEducationAPI, deleteStudentEducationAPI } from '../../../api/studentAPI/studentAPI';
 import ProfilePicture from './ProfilePicture';
 import PersonalDetails from './PersonalDetails';
 import EducationDetails from './EducationDetails';
@@ -17,6 +17,7 @@ interface StudentDetails {
     isVerified: boolean;
     createdAt: string;
     education?: {
+        _id: string;  // Include education's unique ID for editing and deletion
         level: string;
         board: string;
         startDate: string;
@@ -43,36 +44,44 @@ const Profile: React.FC = () => {
                 setError("Failed to fetch student details");
                 setLoading(false);
             }
-        }
-        if(studentInfo?._id) {
+        };
+        if (studentInfo?._id) {
             fetchStudentDetails(studentInfo._id);
         }
     }, [studentInfo?._id]);
 
-    const handleEducationUpdate = async (educationData: any) => {
+    const handleEducationAdd = async (educationData: any) => {
         if (!studentInfo?._id) return;
 
         try {
-        const updatedStudent = await updateStudentEducationAPI(studentInfo._id, ...Object.values(educationData));
-        setStudentDetails(updatedStudent?.data);
+            const updatedStudent = await addStudentEducationAPI(studentInfo._id, educationData);
+            setStudentDetails(updatedStudent?.data);
         } catch (error) {
-        setError("Failed to update education");
+            setError("Failed to update education");
         }
     };
 
-    const handleEducationDelete = async (id: string) => {
+    const handleEducationDelete = async (educationId: string) => {
+        console.log("Inside handleEducationDelete function");
+        console.log("educationId: ", educationId);
+        
+        if (!studentInfo?._id || !educationId) return;
+
         try {
+            console.log("Inside handleEducationDelete function try");
             
+            const updatedStudent = await deleteStudentEducationAPI(studentInfo._id, educationId);
+            setStudentDetails(updatedStudent?.data);
         } catch (error) {
-            
+            setError("Failed to delete education");
         }
-    }
+    };
 
-    const handleEducationEdit = async (editedEducation: Education) => {
-        if (!studentInfo?._id || !editedEducation.id) return;
+    const handleEducationEdit = async (editedEducation: any) => {
+        if (!studentInfo?._id || !editedEducation._id) return;
 
         try {
-            const updatedStudent = await editStudentEducationAPI(studentInfo._id, editedEducation);
+            const updatedStudent = await editStudentEducationAPI(studentInfo._id, editedEducation._id, editedEducation);
             setStudentDetails(updatedStudent?.data);
         } catch (error) {
             setError("Failed to edit education");
@@ -98,7 +107,7 @@ const Profile: React.FC = () => {
                     <div className="container mx-auto px-4 py-8">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-1 gap-6">
-                                <ProfilePicture 
+                                <ProfilePicture
                                     profileImage={studentDetails.profileImage}
                                     name={studentDetails.name}
                                     isBlocked={studentDetails.isBlocked}
@@ -110,11 +119,11 @@ const Profile: React.FC = () => {
                                     isVerified={studentDetails.isVerified}
                                 />
                             </div>
-                            
+
                             <div className="lg:col-span-2">
                                 <EducationDetails
                                     education={studentDetails.education}
-                                    onEducationUpdate={handleEducationUpdate}
+                                    onEducationAdd={handleEducationAdd}
                                     onEducationDelete={handleEducationDelete}
                                     onEducationEdit={handleEducationEdit}
                                 />

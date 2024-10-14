@@ -56,29 +56,88 @@ export const getStudentDetailsAPI = async (id: string) => {
     )
 }
 
-export const updateStudentEducationAPI = async(id: string, level: string, board: string, startDate: string, endDate: string, grade: string, institution: string) => {
+// export const addStudentEducationAPI = async(id: string, level: string, board: string, startDate: string, endDate: string, grade: string, institution: string) => {
+//     try {
+//         return await axios.put(
+//             `${import.meta.env.VITE_API_URL}/students/profile/${id}/add-education`,
+//             {
+//                 level,
+//                 board,
+//                 startDate,
+//                 endDate,
+//                 grade,
+//                 institution
+//             },
+//             {
+//                 withCredentials: true,
+//             }
+//         )
+//     } catch (error) {
+//         console.error("Error logging in:", error);
+//     }
+// }
+
+// export const editStudentEducationAPI = async() => {
+//     try {
+        
+//     } catch (error) {
+        
+//     }
+// }
+
+export const addStudentEducationAPI = async (id: string, educationData: any) => {
     try {
         return await axios.put(
-            `${import.meta.env.VITE_API_URL}/students/profile/${id}/update-education`,
+            `${import.meta.env.VITE_API_URL}/students/profile/${id}/add-education`,
+            educationData,
             {
-                level,
-                board,
-                startDate,
-                endDate,
-                grade,
-                institution
+                withCredentials: true,
             }
-        )
+        );
     } catch (error) {
-        console.error("Error logging in:", error);
+        console.error("Error adding education:", error);
+        throw error;
     }
-}
+};
 
-export const editStudentEducationAPI = async() => {
+export const editStudentEducationAPI = async (id: string, educationId: string, updatedEducation: any) => {
     try {
-        
+        return await axios.put(
+            `${import.meta.env.VITE_API_URL}/students/profile/${id}/edit-education/${educationId}`,
+            updatedEducation,
+            {
+                withCredentials: true,
+            }
+        );
     } catch (error) {
+        console.error("Error editing education:", error);
+        throw error;
+    }
+};
+
+export const deleteStudentEducationAPI = async (id: string, educationId: string) => {
+    try {
+        console.log("Inside deleteStudentEducationAPI");
         
+        return await axios.delete(
+            `${import.meta.env.VITE_API_URL}/students/profile/${id}/delete-education/${educationId}`,
+            {
+                withCredentials: true,
+            }
+        );
+    } catch (error) {
+        console.error("Error deleting education:", error);
+        throw error;
+    }
+};
+
+export const fetchCategoriesAPI = async() => {
+    try {
+        const response = await axiosInstance.get('/students/getcategories');
+        return response;
+    } catch (error) {
+        console.error("Error in loading course categories:", error);
+        throw error;
     }
 }
 

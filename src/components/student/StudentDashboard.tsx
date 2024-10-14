@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Home, User, Wallet, BarChart2, ListTodo, Settings, HelpCircle } from 'lucide-react';
 import { getDashboardAPI } from '@/api/studentAPI/studentAPI';
 
 interface Skill {
     name: string;
-    // icon: string;
-    // students: string;
   }
   
 const courses = [
@@ -16,12 +13,10 @@ const courses = [
 
 const SkillCard = ({ name }: { name: string }) => (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      {/* <div className="text-4xl mb-2">{icon}</div> */}
       <h3 className="text-xl font-bold mb-2">{name}</h3>
-      {/* <p className="text-sm text-gray-600 mb-4">Join Over {students} Students.</p> */}
-      <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+      {/* <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
         Get Started
-      </button>
+      </button> */}
     </div>
   );
   

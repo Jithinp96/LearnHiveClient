@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Star, Menu, X } from 'lucide-react';
+import { Clock, Star, Menu, X, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { fetchAllCoursesAPI } from '@/api/studentAPI/studentAPI';
+import { Input } from '@/components/ui/input';
+import { fetchAllCoursesAPI, fetchCategoriesAPI } from '@/api/studentAPI/studentAPI';
 
 interface Category {
     _id: string;
@@ -22,25 +23,45 @@ interface Course {
     thumbnailUrl: string;
 }
 
+const levels = ['Beginner', 'Intermediate', 'Expert'];
+
 const AllCourseList: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
+    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetchAllCoursesAPI();
-                console.log(response?.data);
-                
-                setCourses(response?.data);
+                const [coursesResponse, categoriesResponse] = await Promise.all([
+                    fetchAllCoursesAPI(),
+                    fetchCategoriesAPI()
+                ]);
+                setCourses(coursesResponse?.data);
+                setFilteredCourses(coursesResponse?.data);
+                setCategories(categoriesResponse?.data);
             } catch (error) {
-                console.error('Error fetching courses:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        fetchCourses();
+        fetchData();
     }, []);
+
+    useEffect(() => {
+        const filtered = courses.filter(course => {
+            const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(course.category._id);
+            const matchesLevel = selectedLevels.length === 0 || selectedLevels.includes(course.level);
+            return matchesSearch && matchesCategory && matchesLevel;
+        });
+        setFilteredCourses(filtered);
+    }, [searchTerm, selectedCategories, selectedLevels, courses]);
 
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -48,6 +69,22 @@ const AllCourseList: React.FC = () => {
 
     const handleViewCourse = (courseId: string) => {
         navigate(`/course/${courseId}`);
+    };
+
+    const handleCategoryChange = (categoryId: string) => {
+        setSelectedCategories(prev => 
+            prev.includes(categoryId) 
+                ? prev.filter(id => id !== categoryId) 
+                : [...prev, categoryId]
+        );
+    };
+
+    const handleLevelChange = (level: string) => {
+        setSelectedLevels(prev => 
+            prev.includes(level) 
+                ? prev.filter(l => l !== level) 
+                : [...prev, level]
+        );
     };
 
     return (
@@ -62,33 +99,35 @@ const AllCourseList: React.FC = () => {
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h2 className="text-xl font-semibold mb-4">Category</h2>
                             <ul className="space-y-2">
-                                {courses.map((course) => (
-                                    <li key={course.category._id} className="flex items-center">
-                                        <input type="checkbox" id={course.category._id} className="mr-2" />
-                                        <label htmlFor={course.category.name}>{course.category.name}</label>
+                                {categories.map((category) => (
+                                    <li key={category._id} className="flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            id={category._id} 
+                                            className="mr-2"
+                                            checked={selectedCategories.includes(category._id)}
+                                            onChange={() => handleCategoryChange(category._id)}
+                                        />
+                                        <label htmlFor={category._id}>{category.name}</label>
                                     </li>
                                 ))}
                             </ul>
 
                             <h2 className="text-xl font-semibold mt-6 mb-4">Level</h2>
                             <ul className="space-y-2">
-                                {courses.map((course) => (
-                                    <li key={course.level} className="flex items-center">
-                                        <input type="checkbox" id={course.level} className="mr-2" />
-                                        <label htmlFor={course.level}>{course.level}</label>
+                                {levels.map((level) => (
+                                    <li key={level} className="flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            id={level} 
+                                            className="mr-2"
+                                            checked={selectedLevels.includes(level)}
+                                            onChange={() => handleLevelChange(level)}
+                                        />
+                                        <label htmlFor={level}>{level}</label>
                                     </li>
                                 ))}
                             </ul>
-
-                            {/* <h2 className="text-xl font-semibold mt-6 mb-4">Price</h2>
-                            <ul className="space-y-2">
-                                {courses.map((course) => (
-                                    <li key={course.price} className="flex items-center">
-                                        <input type="checkbox" id={course.price} className="mr-2" />
-                                        <label htmlFor={course.price}>{course.price}</label>
-                                    </li>
-                                ))}
-                            </ul> */}
                         </div>
                     </div>
                 </div>
@@ -102,8 +141,20 @@ const AllCourseList: React.FC = () => {
                         </Button>
                     </div>
 
+                    {/* Search Bar */}
+                    <div className="mb-6 relative">
+                        <Input
+                            type="text"
+                            placeholder="Search courses..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2"
+                        />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {courses.map((course) => (
+                        {filteredCourses.map((course) => (
                             <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
                                 <img src={course.thumbnailUrl} alt={course.title} className="w-full h-48 object-cover" />
                                 <div className="p-4 flex-grow">

@@ -3,7 +3,7 @@ import { BookOpen, X, Pencil } from 'lucide-react';
 import ConfirmActionDialog from '@/components/Extras/ConfirmationBox';
 
 interface Education {
-    id?: string;
+    _id?: string;
     level: string;
     board: string;
     startDate: string;
@@ -14,20 +14,20 @@ interface Education {
 
 interface EducationDetailsProps {
     education?: Education[];
-    onEducationUpdate: (educationData: Education) => void;
+    onEducationAdd: (educationData: Education) => void;
     onEducationDelete: (id: string) => void;
     onEducationEdit: (editedEducation: Education) => void;
 }
 
 const EducationDetails: React.FC<EducationDetailsProps> = ({ 
     education, 
-    onEducationUpdate, 
+    onEducationAdd, 
     onEducationDelete,
     onEducationEdit
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEducation, setEditingEducation] = useState<Education | null>(null);
-    const [newEducation, setNewEducation] = useState<Education>({
+    const [formData, setFormData] = useState<Education>({
         level: '',
         board: '',
         startDate: '',
@@ -39,7 +39,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
     const openModal = (edu?: Education) => {
         if (edu) {
             setEditingEducation(edu);
-            setNewEducation(edu);
+            setFormData(edu);
         } else {
             setEditingEducation(null);
             resetForm();
@@ -53,7 +53,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
     };
 
     const resetForm = () => {
-        setNewEducation({
+        setFormData({
             level: '',
             board: '',
             startDate: '',
@@ -66,24 +66,29 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        onEducationUpdate(newEducation);
-        closeModal();
-    };
 
-    const handleEditSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        if (editingEducation) {
-            onEducationEdit(newEducation);
+        if (!formData.level || !formData.board || !formData.startDate || !formData.endDate) {
+            alert('All fields are required');
+            return;
         }
+
+        if (editingEducation) {
+            onEducationEdit(formData);
+        } else {
+            onEducationAdd(formData);
+        }
+
         closeModal();
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
-        setNewEducation(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleDelete = (id: string) => {
+        console.log("education id from handle delete in education details.tsx: ", id);
+        
         onEducationDelete(id);
     };
 
@@ -104,7 +109,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
             {education && education.length > 0 ? (
                 <div>
                     {education.map((edu) => (
-                        <div key={edu.id} className="mb-4 p-4 border rounded relative">
+                        <div key={edu._id} className="mb-4 p-4 border rounded relative">
                             <div className="absolute top-2 right-2 flex space-x-2">
                                 <button 
                                     onClick={() => openModal(edu)} 
@@ -113,7 +118,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                                     <Pencil size={16} />
                                 </button>
                                 <ConfirmActionDialog
-                                    onConfirm={() => handleDelete(edu.id!)}
+                                    onConfirm={() => handleDelete(edu._id!)}
                                     triggerElement={{
                                         type: 'icon',
                                         content: '',
@@ -166,120 +171,6 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                             <X className="w-6 h-6" />
                         </button>
                     </div>
-                    <form onSubmit={editingEducation ? handleEditSubmit : handleSubmit} className="p-6">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Level *</label>
-                        <select
-                            className="w-full p-2 border rounded"
-                            name="level"
-                            value={newEducation.level}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">- Select -</option>
-                            <option>Ph.D</option>
-                            <option>Masters</option>
-                            <option>Bachelors</option>
-                            <option>Diploma</option>
-                            <option>Higher Secondary</option>
-                            <option>School</option>
-                            <option>Others</option>
-                        </select>
-                        </div>
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Board/Department *</label>
-                        <input 
-                            type="text" 
-                            className="w-full p-2 border rounded" 
-                            placeholder='Enter your board'
-                            name="board"
-                            value={newEducation.board}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Year *</label>
-                        <select
-                            className="w-full p-2 border rounded"
-                            name="startDate"
-                            value={newEducation.startDate}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">Select Year</option>
-                            {generateYearOptions()}
-                        </select>
-                        </div>
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Graduation Year *</label>
-                        <select
-                            className="w-full p-2 border rounded"
-                            name="endDate"
-                            value={newEducation.endDate}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">Select Year</option>
-                            {generateYearOptions()}
-                        </select>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Grade/CGPA *</label>
-                        <input 
-                            type="text" 
-                            className="w-full p-2 border rounded"
-                            placeholder='Enter your grade'
-                            name="grade"
-                            value={newEducation.grade}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        </div>
-                        <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">School/College/University Name *</label>
-                        <input 
-                            type="text"
-                            className="w-full p-2 border rounded"
-                            placeholder='Enter your institution'
-                            name="institution"
-                            value={newEducation.institution}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        </div>
-                    </div>
-                        
-                        <div className="flex justify-end">
-                            <button 
-                                type="submit" 
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                            >
-                                {editingEducation ? 'Update' : 'Save'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        )}
-
-
-            {/* {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
-                    <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold">
-                        {editingEducation ? 'Edit Educational Qualification' : 'Add Educational Qualification'}
-                    </h2>
-                    <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                        <X className="w-6 h-6" />
-                    </button>
-                    </div>
                     <form onSubmit={handleSubmit} className="p-6">
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
@@ -287,7 +178,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                         <select
                             className="w-full p-2 border rounded"
                             name="level"
-                            value={newEducation.level}
+                            value={formData.level}
                             onChange={handleInputChange}
                             required
                         >
@@ -308,7 +199,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                             className="w-full p-2 border rounded" 
                             placeholder='Enter your board'
                             name="board"
-                            value={newEducation.board}
+                            value={formData.board}
                             onChange={handleInputChange}
                             required
                         />
@@ -320,7 +211,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                         <select
                             className="w-full p-2 border rounded"
                             name="startDate"
-                            value={newEducation.startDate}
+                            value={formData.startDate}
                             onChange={handleInputChange}
                             required
                         >
@@ -333,7 +224,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                         <select
                             className="w-full p-2 border rounded"
                             name="endDate"
-                            value={newEducation.endDate}
+                            value={formData.endDate}
                             onChange={handleInputChange}
                             required
                         >
@@ -344,43 +235,42 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Grade/CGPA *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Grade *</label>
                         <input 
                             type="text" 
-                            className="w-full p-2 border rounded"
-                            placeholder='Enter your grade'
+                            className="w-full p-2 border rounded" 
+                            placeholder='Enter your Grade/CGPA'
                             name="grade"
-                            value={newEducation.grade}
+                            value={formData.grade}
                             onChange={handleInputChange}
                             required
                         />
                         </div>
                         <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">School/College/University Name *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Institution *</label>
                         <input 
-                            type="text"
-                            className="w-full p-2 border rounded"
+                            type="text" 
+                            className="w-full p-2 border rounded" 
                             placeholder='Enter your institution'
                             name="institution"
-                            value={newEducation.institution}
+                            value={formData.institution}
                             onChange={handleInputChange}
                             required
                         />
                         </div>
                     </div>
-                    
                     <div className="flex justify-end">
                         <button 
-                        type="submit" 
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                            type="submit" 
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                         >
-                        {editingEducation ? 'Update' : 'Save'}
+                            {editingEducation ? 'Save Changes' : 'Add Qualification'}
                         </button>
                     </div>
                     </form>
                 </div>
-                </div>
-            )} */}
+            </div>
+            )}
         </div>
     );
 };
