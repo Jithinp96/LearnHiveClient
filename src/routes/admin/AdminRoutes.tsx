@@ -11,6 +11,7 @@ import AdminStudentDetailsPage from "../../pages/admin/AdminStudentDetailsPage";
 import AdminCourseCategoryPage from "../../pages/admin/AdminCourseCategoryPage";
 import TutorListPage from "../../pages/admin/TutorListPage";
 import TutorDetailsPage from "../../pages/admin/TutorDetailsPage";
+import AdminCourseCategoryListPage from "@/pages/admin/AdminCourseListPage";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="/tutors" element={<TutorListPage />} />
         <Route path="/tutor/:id" element={<TutorDetailsPage />} />
         <Route path="/course-categories" element={<AdminCourseCategoryPage />} />
+        <Route path="/courses" element={<AdminCourseCategoryListPage />} />
       </Route>
     </Routes>
   );

@@ -114,6 +114,19 @@ export const toggleCategoryStatus = async (_id: string, status: boolean) => {
     }
 };
 
+export const getCourseList = async () => {
+    try {
+        return await axios.get(
+            `${import.meta.env.VITE_API_URL}/admin/courses`,
+            {
+                withCredentials: true
+            }
+        )
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const refreshTokenAPI = async () => {
     try {
         return await axios.post(

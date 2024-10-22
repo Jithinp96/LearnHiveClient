@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
-import { editStudentEducationAPI, getStudentDetailsAPI, addStudentEducationAPI, deleteStudentEducationAPI } from '../../../api/studentAPI/studentAPI';
+import { 
+  editStudentEducationAPI, 
+  getStudentDetailsAPI, 
+  addStudentEducationAPI, 
+  deleteStudentEducationAPI,
+  updateStudentNameAPI,
+  updateStudentProfileImageAPI,
+  updateStudentMobileAPI
+} from '../../../api/studentAPI/studentAPI';
 import ProfilePicture from './ProfilePicture';
 import PersonalDetails from './PersonalDetails';
 import EducationDetails from './EducationDetails';
@@ -17,7 +25,7 @@ interface StudentDetails {
     isVerified: boolean;
     createdAt: string;
     education?: {
-        _id: string;  // Include education's unique ID for editing and deletion
+        _id: string;
         level: string;
         board: string;
         startDate: string;
@@ -62,14 +70,9 @@ const Profile: React.FC = () => {
     };
 
     const handleEducationDelete = async (educationId: string) => {
-        console.log("Inside handleEducationDelete function");
-        console.log("educationId: ", educationId);
-        
         if (!studentInfo?._id || !educationId) return;
 
         try {
-            console.log("Inside handleEducationDelete function try");
-            
             const updatedStudent = await deleteStudentEducationAPI(studentInfo._id, educationId);
             setStudentDetails(updatedStudent?.data);
         } catch (error) {
@@ -85,6 +88,55 @@ const Profile: React.FC = () => {
             setStudentDetails(updatedStudent?.data);
         } catch (error) {
             setError("Failed to edit education");
+        }
+    };
+
+    const handleNameUpdate = async (newName: string) => {
+        if (!studentInfo?._id) return;
+
+        try {
+            console.log("Inside handle name update in profile.tsx");
+            console.log("newName: ", newName);
+            console.log("studentInfo._id: ", studentInfo._id);
+            
+            const updatedStudent = await updateStudentNameAPI(studentInfo._id, newName);
+
+            console.log("updatedStudent after name: ", updatedStudent);
+            
+            setStudentDetails(prevDetails => ({
+                ...prevDetails!,
+                name: updatedStudent?.data.name
+            }));
+        } catch (error) {
+            setError("Failed to update name");
+        }
+    };
+
+    const handleImageUpdate = async (newImageFile: File) => {
+        if (!studentInfo?._id) return;
+
+        try {
+            const updatedStudent = await updateStudentProfileImageAPI(studentInfo._id, newImageFile);
+            setStudentDetails(prevDetails => ({
+                ...prevDetails!,
+                profileImage: updatedStudent.data.profileImage
+            }));
+        } catch (error) {
+            setError("Failed to update profile image");
+        }
+    };
+
+    const handleMobileUpdate = async (newMobile: number) => {
+        if (!studentInfo?._id) return;
+
+        try {
+            const updatedStudent = await updateStudentMobileAPI(studentInfo._id, newMobile);
+            setStudentDetails(prevDetails => ({
+                ...prevDetails!,
+                mobile: updatedStudent?.data.mobile
+            }));
+        } catch (error) {
+            setError("Failed to update mobile number");
         }
     };
 
@@ -111,12 +163,15 @@ const Profile: React.FC = () => {
                                     profileImage={studentDetails.profileImage}
                                     name={studentDetails.name}
                                     isBlocked={studentDetails.isBlocked}
+                                    onNameUpdate={handleNameUpdate}
+                                    onImageUpdate={handleImageUpdate}
                                 />
                                 <PersonalDetails
                                     email={studentDetails.email}
                                     mobile={studentDetails.mobile}
                                     createdAt={studentDetails.createdAt}
                                     isVerified={studentDetails.isVerified}
+                                    onMobileUpdate={handleMobileUpdate}
                                 />
                             </div>
 

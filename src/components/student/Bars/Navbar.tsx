@@ -4,6 +4,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { logoutStudent } from '../../../redux/slices/studentSlice';
 import { logoutStudentAPI } from '../../../api/studentAPI/studentAPI';
+import { 
+  ShoppingCart, 
+  Library, 
+  Home, 
+  BookOpen, 
+  Settings, 
+  Phone
+} from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +30,6 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    
     const response = await logoutStudentAPI('student')
     console.log(response);
     
@@ -53,51 +60,81 @@ const Navbar: React.FC = () => {
 
         {/* Menu Links */}
         <div
-          className={`md:flex items-center md:space-x-4 space-y-2 md:space-y-0 absolute md:static bg-gray-800 md:bg-transparent w-full md:w-auto left-0 top-16 md:top-0 z-10 ${
+          className={`md:flex items-center md:space-x-4 space-y-2 md:space-y-0 absolute md:static bg-gray-800 md:bg-transparent w-full md:w-auto left-0 top-16 md:top-0 z-20 ${
             isOpen ? 'block' : 'hidden'
           }`}
         >
-          <a href="/" className="block text-white px-4 py-2 md:inline">
-            Home
+          <a href="/" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <Home className="h-5 w-5" />
+            <span>Home</span>
           </a>
-          <a href="/allcourses" className="block text-white px-4 py-2 md:inline">
-            Courses
+          <a href="/allcourses" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <BookOpen className="h-5 w-5" />
+            <span>Courses</span>
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
-            Services
+          <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <Settings className="h-5 w-5" />
+            <span>Services</span>
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
-            Contact
+          <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <Phone className="h-5 w-5" />
+            <span>Contact</span>
           </a>
+          {isStudentAuthenticated && studentInfo && (
+            <>
+              <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+              <Library className="h-5 w-5" />
+              <span>Your Courses</span>
+          </a>
+            </>
+          )}
         </div>
 
-        {/* Profile Icon with Dropdown */}
-        {isStudentAuthenticated && studentInfo && (
-          <div className="relative hidden md:block">
-            <img
-              onClick={handleDropdownToggle}
-              className="h-8 w-8 rounded-full cursor-pointer"
-              src="https://via.placeholder.com/40"
-              alt="Profile"
-            />
+        {/* Icons and Profile Section */}
+        <div className="flex items-center space-x-4">
+          {/* Cart and Library Icons (Only shown when authenticated) */}
+          {isStudentAuthenticated && studentInfo && (
+            <>
+              <button 
+                onClick={() => navigate('/cart')} 
+                className="text-white hover:text-gray-300 transition-colors"
+              >
+                <ShoppingCart className="h-6 w-6" />
+              </button>
+            </>
+          )}
 
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg">
-                <ul>
-                  <li
-                    className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                    onClick={() => navigate('/profile')}
-                  >
-                    Profile
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={handleLogout}>
-                    Logout
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+          {/* Profile Icon with Dropdown */}
+          {isStudentAuthenticated && studentInfo && (
+            <div className="relative hidden md:block">
+              <img
+                onClick={handleDropdownToggle}
+                className="h-8 w-8 rounded-full cursor-pointer"
+                src={studentInfo.profileImage}
+                alt="Profile Picture"
+              />
+
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                  <ul>
+                    <li
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center space-x-2"
+                      onClick={() => navigate('/profile')}
+                    >
+                      Profile
+                    </li>
+                    <li 
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center space-x-2" 
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

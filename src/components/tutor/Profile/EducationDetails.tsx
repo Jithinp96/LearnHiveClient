@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpen, X, Pencil, Trash2 } from 'lucide-react';
-import { addTutorEducationAPI } from '@/api/tutorAPI/tutorAxios';
+import { BookOpen, X, Pencil } from 'lucide-react';
+import ConfirmActionDialog from '@/components/ui/ConfirmationBox';
 
 interface Education {
-    id?: string;
+    _id?: string;
     level: string;
     board: string;
     startDate: string;
@@ -14,19 +14,20 @@ interface Education {
 
 interface EducationDetailsProps {
     education?: Education[];
-    tutorId: string;
-    onEducationUpdate: () => void;
+    onEducationAdd: (educationData: Education) => void;
+    onEducationDelete: (id: string) => void;
+    onEducationEdit: (editedEducation: Education) => void;
 }
 
 const EducationDetails: React.FC<EducationDetailsProps> = ({ 
-    education,
-    tutorId,
-    onEducationUpdate,
+    education, 
+    onEducationAdd, 
+    onEducationDelete,
+    onEducationEdit
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEducation, setEditingEducation] = useState<Education | null>(null);
-    const [newEducation, setNewEducation] = useState<Education>({
-        id: '',
+    const [formData, setFormData] = useState<Education>({
         level: '',
         board: '',
         startDate: '',
@@ -34,16 +35,11 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
         grade: '',
         institution: ''
     });
-    const [isLoading, setIsLoading] = useState(false);
 
     const openModal = (edu?: Education) => {
         if (edu) {
             setEditingEducation(edu);
-            setNewEducation({
-                ...edu,
-                startDate: edu.startDate.slice(0, 10),
-                endDate: edu.endDate.slice(0, 10),
-            });
+            setFormData(edu);
         } else {
             setEditingEducation(null);
             resetForm();
@@ -57,45 +53,43 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
     };
 
     const resetForm = () => {
-        setNewEducation({
-            id: '',
+        setFormData({
             level: '',
             board: '',
             startDate: '',
             endDate: '',
             grade: '',
-            institution: '',
+            institution: ''
         });
         setEditingEducation(null);
     };
 
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        setIsLoading(true);
-        try {
-            await addTutorEducationAPI(
-                tutorId,
-                newEducation.id?? null,
-                newEducation.level,
-                newEducation.board,
-                newEducation.startDate,
-                newEducation.endDate,
-                newEducation.grade,
-                newEducation.institution
-            );
-            onEducationUpdate();
-            closeModal();
-        } catch (error) {
-            console.error("Error updating education:", error);
-            alert("Failed to update education. Please try again.");
-        } finally {
-            setIsLoading(false);
+
+        if (!formData.level || !formData.board || !formData.startDate || !formData.endDate) {
+            alert('All fields are required');
+            return;
         }
+
+        if (editingEducation) {
+            onEducationEdit(formData);
+        } else {
+            onEducationAdd(formData);
+        }
+
+        closeModal();
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
-        setNewEducation(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleDelete = (id: string) => {
+        console.log("education id from handle delete in education details.tsx: ", id);
+        
+        onEducationDelete(id);
     };
 
     const generateYearOptions = () => {
@@ -115,19 +109,27 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
         {education && education.length > 0 ? (
             <div>
                 {education.map((edu) => (
-                    <div key={edu.id} className="mb-4 p-4 border rounded relative">
+                    <div key={edu._id} className="mb-4 p-4 border rounded relative">
                     <div className="absolute top-2 right-2 flex space-x-2">
                         <button 
-                        onClick={() => openModal(edu)} 
-                        className="text-blue-500 hover:text-blue-600"
+                            onClick={() => openModal(edu)} 
+                            className="text-blue-500 hover:text-blue-600"
                         >
-                        <Pencil size={16} />
+                            <Pencil size={16} />
                         </button>
-                        <button
-                        className="text-red-500 hover:text-red-600"
-                        >
-                        <Trash2 size={16} />
-                        </button>
+                        <ConfirmActionDialog
+                            onConfirm={() => handleDelete(edu._id!)}
+                            triggerElement={{
+                                type: 'icon',
+                                content: '',
+                                iconName: 'Trash2'
+                            }}
+                            title="Delete Education Entry"
+                            description="Are you sure you want to delete this education entry? This action cannot be undone."
+                            confirmText="Delete"
+                            cancelText="Cancel"
+                            variant="destructive"
+                        />
                     </div>
                     <p className='text-sm font-bold pb-2'>{edu.level} in {edu.board}</p>
                     <p className='text-xs font-medium text-gray-500 pb-2'>From {edu.institution}</p>
@@ -176,7 +178,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                                 <select
                                     className="w-full p-2 border rounded"
                                     name="level"
-                                    value={newEducation.level}
+                                    value={formData.level}
                                     onChange={handleInputChange}
                                     required
                                 >
@@ -196,7 +198,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                                     className="w-full p-2 border rounded" 
                                     placeholder='Enter your board'
                                     name="board"
-                                    value={newEducation.board}
+                                    value={formData.board}
                                     onChange={handleInputChange}
                                     required
                                 />
@@ -208,7 +210,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                             <select
                                 className="w-full p-2 border rounded"
                                 name="startDate"
-                                value={newEducation.startDate}
+                                value={formData.startDate}
                                 onChange={handleInputChange}
                                 required
                             >
@@ -221,7 +223,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                             <select
                                 className="w-full p-2 border rounded"
                                 name="endDate"
-                                value={newEducation.endDate}
+                                value={formData.endDate}
                                 onChange={handleInputChange}
                                 required
                             >
@@ -238,7 +240,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                                 className="w-full p-2 border rounded"
                                 placeholder='Enter your grade'
                                 name="grade"
-                                value={newEducation.grade}
+                                value={formData.grade}
                                 onChange={handleInputChange}
                                 required
                             />
@@ -250,7 +252,7 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                                 className="w-full p-2 border rounded"
                                 placeholder='Enter your institution'
                                 name="institution"
-                                value={newEducation.institution}
+                                value={formData.institution}
                                 onChange={handleInputChange}
                                 required
                             />
@@ -259,10 +261,10 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
                     
                         <div className="flex justify-end">
                             <button 
-                            type="submit" 
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                type="submit" 
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                             >
-                            {editingEducation ? 'Update' : 'Save'}
+                                {editingEducation ? 'Save Changes' : 'Add Qualification'}
                             </button>
                         </div>
                     </form>

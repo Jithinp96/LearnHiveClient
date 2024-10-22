@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Star, User, Clock, Video, ChevronUp, ChevronDown, ChartBarStacked, CircleCheckBig } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
+import { addToCartAPI, createCoursePaymentIntentAPI } from '@/api/studentAPI/studentAPI';
 import { fetchCoursesDetailsAPI } from '@/api/studentAPI/studentAPI';
+import { loadStripe } from '@stripe/stripe-js';
 
 interface Tutor {
   name: string,
@@ -20,6 +25,7 @@ interface Video {
 }
 
 interface Course {
+  _id: string;
   title: string;
   description: string;
   shortDescription: string;
@@ -39,6 +45,8 @@ const CourseDetail: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedVideos, setExpandedVideos] = useState<Set<number>>(new Set());
+
+  const { studentInfo } = useSelector((state: RootState) => state.student);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -65,6 +73,35 @@ const CourseDetail: React.FC = () => {
       return newSet;
     });
   };
+
+  const addToCart = async () => {
+    try {
+      const userId = studentInfo?._id ?? ''
+      await addToCartAPI(userId, course?._id ?? '');
+      toast.success("Coure added to cart")
+    } catch (error) {
+      console.error('Failed to add course to cart:', error);
+      toast.success('Could not add course to cart.');
+    }
+  };
+
+  const handleEnroll = async () => {
+    if (!course) return;
+    try {
+      const userId = studentInfo?._id ?? ''
+      const stripe_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+      const stripe = await loadStripe(stripe_key);
+      console.log(course);
+      
+      const session = await createCoursePaymentIntentAPI(course);
+      const result = stripe?.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+    } catch (error) {
+      
+    }
+  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -105,7 +142,6 @@ const CourseDetail: React.FC = () => {
                     {expandedVideos.has(videoIndex) && (
                       <div className="mt-2 bg-white rounded-lg shadow-sm p-4">
                         <p className="text-gray-700">{video.description}</p>
-                        {/* You can add more video details or a video player here if needed */}
                       </div>
                     )}
                   </div>
@@ -115,7 +151,7 @@ const CourseDetail: React.FC = () => {
               )}
             </div>
           </div>
-          {/* Right Panel - Now Fixed */}
+          {/* Right Panel */}
           <div className="md:w-1/3">
             <div className="sticky top-8">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -126,15 +162,29 @@ const CourseDetail: React.FC = () => {
                     <span className="ml-1 text-yellow-400">{course.rating || 'No rating yet'}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-4">{course?.price === 0 ? 'FREE' : `₹${course?.price}`}</div>
-                  <button className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300">
+                  <button 
+                    onClick={addToCart}
+                    className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Add to Cart
+                  </button>
+                  <button 
+                    onClick={handleEnroll}
+                    className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
                     Enroll Now
                   </button>
                   <div className="mt-6 space-y-4">
-                    <div className="flex items-center">
-                      <User className="w-5 h-5 text-gray-500 mr-2" />
-                      <span className="text-gray-600">Created by</span>
-                      <span className="ml-auto font-medium">{course?.tutorId.name|| 'Instructor Name'}</span>
-                    </div>
+                  <div className="flex items-center">
+                    <User className="w-5 h-5 text-gray-500 mr-2" />
+                    <span className="text-gray-600">Created by:</span>
+                    <a
+                      href={`/tutorprofile/${course?.tutorId?._id}`}
+                      className="ml-auto font-medium text-blue-600 hover:underline"
+                    >
+                      {course?.tutorId?.name || 'Instructor Name'}
+                    </a>
+                  </div>
                     <div className="flex items-center">
                       <ChartBarStacked  className="w-5 h-5 text-gray-500 mr-2" />
                       <span className="text-gray-600">Category</span>

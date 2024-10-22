@@ -11,6 +11,7 @@ import ResetPasswordPage from "../../pages/tutor/ResetPasswordPage";
 import ProfilePage from "../../pages/tutor/ProfilePage";
 import CoursePage from "@/pages/tutor/CoursePage";
 import AddNewCoursePage from "@/pages/tutor/AddNewCoursePage";
+import TutorAppointmentPage from "@/pages/tutor/AppointmentPage";
 
 const TutorRoutes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const TutorRoutes: React.FC = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/course-list" element={<CoursePage />} />
         <Route path="/add-course" element={<AddNewCoursePage />} />
+        <Route path="/appointment" element={<TutorAppointmentPage />} />
       </Route>
     </Routes>
   );

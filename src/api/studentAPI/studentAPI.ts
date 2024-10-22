@@ -56,35 +56,6 @@ export const getStudentDetailsAPI = async (id: string) => {
     )
 }
 
-// export const addStudentEducationAPI = async(id: string, level: string, board: string, startDate: string, endDate: string, grade: string, institution: string) => {
-//     try {
-//         return await axios.put(
-//             `${import.meta.env.VITE_API_URL}/students/profile/${id}/add-education`,
-//             {
-//                 level,
-//                 board,
-//                 startDate,
-//                 endDate,
-//                 grade,
-//                 institution
-//             },
-//             {
-//                 withCredentials: true,
-//             }
-//         )
-//     } catch (error) {
-//         console.error("Error logging in:", error);
-//     }
-// }
-
-// export const editStudentEducationAPI = async() => {
-//     try {
-        
-//     } catch (error) {
-        
-//     }
-// }
-
 export const addStudentEducationAPI = async (id: string, educationData: any) => {
     try {
         return await axios.put(
@@ -117,8 +88,6 @@ export const editStudentEducationAPI = async (id: string, educationId: string, u
 
 export const deleteStudentEducationAPI = async (id: string, educationId: string) => {
     try {
-        console.log("Inside deleteStudentEducationAPI");
-        
         return await axios.delete(
             `${import.meta.env.VITE_API_URL}/students/profile/${id}/delete-education/${educationId}`,
             {
@@ -166,8 +135,6 @@ export const fetchCoursesDetailsAPI = async (courseId: string) => {
 
 export const getDashboardAPI = async () => {
     try {
-        console.log("reached getDashboadAPI in student apio");
-        
         return await axiosInstance.get(`/students/dashboard`,
             {
                 withCredentials:true
@@ -177,3 +144,129 @@ export const getDashboardAPI = async () => {
         console.error("Error in loading dashboard:", error);
     }
 }
+
+export const updateStudentNameAPI = async (id: string, newName: string) => {
+    try {
+        return await axiosInstance.put(`/students/profile/edit-name`,
+            {
+                id,
+                newName
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const updateStudentProfileImageAPI = async (id: string, newImageFile: File) => {
+    try {
+        const formData = new FormData();
+        formData.append("image", newImageFile);
+
+        return await axiosInstance.put(`/students/profile/edit-profilePic/${id}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+    } catch (error) {
+        console.error("Error uploading profile pic:", error);
+        throw error;
+    }
+}
+
+export const updateStudentMobileAPI = async (id: string, newNumber: number) => {
+    try {
+        return await axiosInstance.put(`/students/profile/edit-mobile`,
+            {
+                id,
+                newNumber
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const addToCartAPI = async (userId: string, courseId: string) => {
+    try {        
+        return await axiosInstance.post('/students/add-to-cart',
+            {
+                userId,
+                courseId
+            }
+        )
+    } catch (error) {
+        console.error("Error in adding course to cart: ", error);
+    }
+}
+
+export const deleteFromCartAPI = async(id: string) => {
+    try {
+        return await axiosInstance.delete(`/students/cart/delete/${id}`)
+    } catch (error) {
+        console.error("Error in deleting from cart: ", error);
+    }
+}
+
+export const fetchCartAPI = async () => {
+    try {
+        return await axiosInstance.get('/students/cart')
+    } catch (error) {
+        console.error("Error in loading cart: ", error);
+    }
+}
+
+export const makePaymentAPI = async (cartDetails: object) => {
+    try {
+        const response = await axiosInstance.post('/students/create-checkout-session',
+            { cartDetails },
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        )
+        return response.data;
+    } catch (error) {
+        console.error("Error in payment: ", error);
+    }
+}
+
+export const getTutorDetailsForStudentAPI = async (id: string) => {
+    try {
+        return await axiosInstance.get(`/students/tutorprofile/${id}`);
+    } catch (error) {
+        console.error("Error in getTutorDetailsAPI:", error);
+    }
+};
+
+export const getTutorSlotsAPI = async (id: string) => {
+    try {
+        return await axiosInstance.get(`/students/slotbooking/${id}`)
+    } catch (error) {
+        console.error("Error in getTutorSlotsAPI:", error);
+    }
+}
+
+export const createPaymentIntentAPI = async (slotDetails: object) => {
+    try {
+        const response = await axiosInstance.post('/students/slotbooking/create-payment-intent', slotDetails, 
+            { 
+                headers : {  "Content-Type": "application/json"} 
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createCoursePaymentIntentAPI = async (courseDetails: object) => {
+    try {
+        const response = await axiosInstance.post('/students/courseenroll/create-payment-intent', courseDetails, 
+            { 
+                headers : {  "Content-Type": "application/json"} 
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

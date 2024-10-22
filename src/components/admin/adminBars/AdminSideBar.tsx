@@ -10,7 +10,7 @@ const AdminSidebar: React.FC = () => {
     { icon: Users, text: 'Students', path: '/admin/students' },
     { icon: SquareUserRound, text: 'Teachers', path: '/admin/tutors' },
     { icon: Book, text: 'Courses Category', path: '/admin/course-categories' },
-    // { icon: BookOpenText, text: 'Courses', path: '/admin/courses' },
+    { icon: BookOpenText, text: 'Courses', path: '/admin/courses' },
   ];
 
   return (

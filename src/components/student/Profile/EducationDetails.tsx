@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, X, Pencil } from 'lucide-react';
-import ConfirmActionDialog from '@/components/Extras/ConfirmationBox';
+import ConfirmActionDialog from '@/components/ui/ConfirmationBox';
 
 interface Education {
     _id?: string;
@@ -87,8 +87,6 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
     };
 
     const handleDelete = (id: string) => {
-        console.log("education id from handle delete in education details.tsx: ", id);
-        
         onEducationDelete(id);
     };
 

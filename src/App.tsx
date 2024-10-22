@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -13,43 +14,46 @@ import HomePage from "./pages/HomePage";
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Public Route */}
-        <Route 
-          path="/" 
-          element={
-            <ErrorBoundary>
-              <HomePage />
-            </ErrorBoundary>
-          } 
-        />
-        <Route 
-          path="/*" 
-          element={
-            <ErrorBoundary>
-              <StudentRoutes />
-            </ErrorBoundary>
-          } 
-        />
-        <Route 
-          path="/tutor/*" 
-          element={
-            <ErrorBoundary >
-              <TutorRoutes />
-            </ErrorBoundary>
-          } 
-        />
-        <Route 
-          path="/admin/*" 
-          element={
-            <ErrorBoundary>
-              <AdminRoutes />
-            </ErrorBoundary>
-          } 
-        />
-      </Routes>
-    </Router>
+    <>
+      <Toaster position="top-center" reverseOrder={false} />
+      <Router>
+        <Routes>
+          {/* Public Route */}
+          <Route 
+            path="/" 
+            element={
+              <ErrorBoundary>
+                <HomePage />
+              </ErrorBoundary>
+            } 
+          />
+          <Route 
+            path="/*" 
+            element={
+              <ErrorBoundary>
+                <StudentRoutes />
+              </ErrorBoundary>
+            } 
+          />
+          <Route 
+            path="/tutor/*" 
+            element={
+              <ErrorBoundary >
+                <TutorRoutes />
+              </ErrorBoundary>
+            } 
+          />
+          <Route 
+            path="/admin/*" 
+            element={
+              <ErrorBoundary>
+                <AdminRoutes />
+              </ErrorBoundary>
+            } 
+          />
+        </Routes>
+      </Router>
+    </>
   );
 };
 

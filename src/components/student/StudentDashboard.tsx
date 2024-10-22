@@ -3,7 +3,7 @@ import { getDashboardAPI } from '@/api/studentAPI/studentAPI';
 
 interface Skill {
     name: string;
-  }
+}
   
 const courses = [
     { name: 'HTML', progress: 80, icon: '5', color: 'bg-green-600' },
@@ -45,14 +45,13 @@ const StudentDashboard : React.FC = () => {
     // Fetch categories from the backend
     useEffect(() => {
         const fetchSkills = async () => {
-        try {
-            const response = await getDashboardAPI()
-            setSkills(response?.data.categories);
-        } catch (error) {
-            console.error('Error fetching skills:', error);
-        }
+            try {
+                const response = await getDashboardAPI()
+                setSkills(response?.data.categories);
+            } catch (error) {
+                console.error('Error fetching skills:', error);
+            }
         };
-
         fetchSkills();
     }, []);
 

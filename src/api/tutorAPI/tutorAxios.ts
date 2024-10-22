@@ -69,32 +69,139 @@ export const getTutorDetailsAPI = async (id: string) => {
 };
 
 // Add tutor education
-export const addTutorEducationAPI = async (
-    id: string,
-    educationId: string | null,
-    level: string,
-    board: string,
-    startDate: string,
-    endDate: string,
-    grade: string,
-    institution: string
-) => {
+export const addTutorEducationAPI = async (id: string, educationData: any) => {
     try {
-        return await axiosInstance.put(`/tutor/profile/${id}/update-education`, {
-        educationId,
-        level,
-        board,
-        startDate,
-        endDate,
-        grade,
-        institution,
-        });
+        return await axiosInstance.put(
+            `/tutor/profile/${id}/add-education`, 
+            educationData
+        );
     } catch (error) {
         console.error("Error adding education:", error);
     }
 };
 
-// Add course
+export const editTutorEducationAPI = async (id: string, educationId: string, updatedEducation: any) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/${id}/edit-education/${educationId}`,
+            updatedEducation
+        )
+    } catch (error) {
+        console.error("Error editing education:", error);
+        throw error;
+    }
+}
+
+export const deleteTutorEducationAPI = async(id: string, educationId: string) => {
+    try {
+        return await axiosInstance.delete(
+            `/tutor/profile/${id}/delete-education/${educationId}`
+        )
+    } catch (error) {
+        console.error("Error deleting education:", error);
+        throw error;
+    }
+}
+
+export const updateTutorNameAPI = async (id: string, newName: string) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/edit-name`,
+            {
+                id,
+                newName
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const updateTutorProfileImageAPI = async (id: string, newImageFile: File) => {
+    try {
+        const formData = new FormData();
+        formData.append("image", newImageFile);
+
+        return await axiosInstance.put(
+            `/tutor/profile/edit-profilePic/${id}`, 
+            formData, 
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+    } catch (error) {
+        console.error("Error uploading profile pic:", error);
+        throw error;
+    }
+}
+
+export const updateTutorMobileAPI = async (id: string, newNumber: number) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/edit-mobile`,
+            {
+                id,
+                newNumber
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const addTutorSubjectAPI = async (tutorId: string, subjectData: object) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/add-subject`,
+            {
+                tutorId,
+                subjectData
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const editTutorSubjectAPI = async (tutorId: string, subjectId: string, editedSubject: object) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/edit-subject`,
+            {
+                tutorId,
+                subjectId,
+                editedSubject
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const deleteTutorSubjectAPI = async (tutorId: string, subjectId: string) => {
+    try {
+        return await axiosInstance.put(
+            `/tutor/profile/delete-subject`,
+            {
+                tutorId,
+                subjectId
+            }
+        )
+    } catch (error) {
+        console.error("Error in updating name:", error);
+    }
+}
+
+export const fetchSubjectsAPI = async() => {
+    try {
+        const response = await axiosInstance.get('/tutor/getSubjects');
+        return response;
+    } catch (error) {
+        console.error("Error in loading course categories:", error);
+        throw error;
+    }
+}
+
 export const addCourseAPI = async (
     tutorId: string,
     title: string,
@@ -128,7 +235,6 @@ export const addCourseAPI = async (
     }
 };
 
-// Upload video
 export const uploadVideoAPI = async (file: File) => {
     try {
         const formData = new FormData();
@@ -147,19 +253,15 @@ export const uploadVideoAPI = async (file: File) => {
 
 export const uploadThumbnailAPI = async(file: File) => {
     try {
-        console.log("Reached uploadThumbnailAPI");
-        console.log("Starting thumbnail upload for file: ", file.name);
         const formData = new FormData();
         formData.append("image", file);
-        console.log("formData: ", formData);
-        console.log("formData keys: ", Array.from(formData.keys()));
 
         const response = await axiosInstance.post("/tutor/upload-thumbnail", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
         console.log("Response: ", response);
         
-    return response.data;
+        return response.data;
     } catch (error) {
         console.error("Error uploading thumbnail:", error);
         throw error;
@@ -184,6 +286,33 @@ export const fetchTutorCoursesAPI = async(id: string) => {
         return response
     } catch (error) {
         console.error("Error in loading course list:", error);
+        throw error;
+    }
+}
+
+export const fetchSlotsAPI = async() => {
+    try {
+        return await axiosInstance.get('/tutor/appointment')
+    } catch (error) {
+        console.error("Error in loading slots list:", error);
+        throw error;
+    }
+}
+
+export const createSlotAPI = async(slotData: object) => {
+    try {
+        return await axiosInstance.post('/tutor/addslot', slotData)
+    } catch (error) {
+        console.error("Error in creating slot:", error);
+        throw error;
+    }
+}
+
+export const editSlotAPI = async(slotId: string, slotData: object) => {
+    try {
+        return await axiosInstance.put('/tutor/editslot', { slotData, slotId })
+    } catch (error) {
+        console.error("Error in creating slot:", error);
         throw error;
     }
 }
