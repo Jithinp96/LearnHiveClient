@@ -36,7 +36,7 @@ interface TimeSlot {
 }
 
 interface SlotBookingProps {
-  // Add any required props here
+
 }
 
 const SlotBooking: React.FC<SlotBookingProps> = () => {
