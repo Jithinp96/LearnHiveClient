@@ -4,10 +4,12 @@ import { Star, User, Clock, Video, ChevronUp, ChevronDown, ChartBarStacked, Circ
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { loadStripe } from '@stripe/stripe-js';
 
+import CourseEnrollmentModal from './CourseEnrollmentModal';
 import { addToCartAPI, createCoursePaymentIntentAPI } from '@/api/studentAPI/studentAPI';
 import { fetchCoursesDetailsAPI } from '@/api/studentAPI/studentAPI';
-import { loadStripe } from '@stripe/stripe-js';
+
 
 interface Tutor {
   name: string,
@@ -74,16 +76,16 @@ const CourseDetail: React.FC = () => {
     });
   };
 
-  const addToCart = async () => {
-    try {
-      const userId = studentInfo?._id ?? ''
-      await addToCartAPI(userId, course?._id ?? '');
-      toast.success("Coure added to cart")
-    } catch (error) {
-      console.error('Failed to add course to cart:', error);
-      toast.success('Could not add course to cart.');
-    }
-  };
+  // const addToCart = async () => {
+  //   try {
+  //     const userId = studentInfo?._id ?? ''
+  //     await addToCartAPI(userId, course?._id ?? '');
+  //     toast.success("Coure added to cart")
+  //   } catch (error) {
+  //     console.error('Failed to add course to cart:', error);
+  //     toast.success('Could not add course to cart.');
+  //   }
+  // };
 
   const handleEnroll = async () => {
     if (!course) return;
@@ -99,7 +101,7 @@ const CourseDetail: React.FC = () => {
       });
 
     } catch (error) {
-      
+      console.log(error);
     }
   }
 
@@ -162,18 +164,22 @@ const CourseDetail: React.FC = () => {
                     <span className="ml-1 text-yellow-400">{course.rating || 'No rating yet'}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-4">{course?.price === 0 ? 'FREE' : `₹${course?.price}`}</div>
-                  <button 
+                  {/* <button 
                     onClick={addToCart}
                     className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
                   >
                     Add to Cart
-                  </button>
-                  <button 
+                  </button> */}
+                  {/* <button 
                     onClick={handleEnroll}
                     className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
                   >
                     Enroll Now
-                  </button>
+                  </button> */}
+                  <CourseEnrollmentModal 
+                    course={course} 
+                    onEnroll={handleEnroll}
+                  />
                   <div className="mt-6 space-y-4">
                   <div className="flex items-center">
                     <User className="w-5 h-5 text-gray-500 mr-2" />

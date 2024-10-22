@@ -17,6 +17,7 @@ import TutorProfilePage from "@/pages/student/TutorProfilePage";
 import SlotBookingPage from "@/pages/student/SlotBookingPage";
 import PaymentSuccessPage from "@/pages/student/PaymentSuccessPage";
 import PaymentFailurePage from "@/pages/student/PaymentFailurePage";
+import OrderListPage from "@/pages/student/OrderListPage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -38,6 +39,7 @@ const StudentRoutes: React.FC = () => {
         <Route path="/slotbooking/:tutorId" element={<SlotBookingPage />} />
         <Route path="/paymentsuccess" element={<PaymentSuccessPage />} />
         <Route path="/paymentfailure" element={<PaymentFailurePage />} />
+        <Route path="/orders" element={<OrderListPage />} />
       </Route>
       
       <Route path="/allcourses" element={<AllCourseListPage />} />

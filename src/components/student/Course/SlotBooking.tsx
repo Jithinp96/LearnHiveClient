@@ -26,7 +26,7 @@ import {
 interface TimeSlot {
   _id: string;
   tutorId: string;
-  title: string;
+  subject: string;
   level: string;
   date: string;
   startTime: string;
@@ -71,34 +71,11 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
     try {
       const stripe_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
       const stripe = await loadStripe(stripe_key);
-    //   const body = {
-    //     slotDetails: selectedSlot,
-    //   };
-
-    //   const headers = {
-    //     "Content-Type": "application/json",
-    //   };
-
-    //   const response = await fetch(
-    //     `http://localhost:5000/api/students/slotbooking/create-payment-intent`,
-    //     {
-    //       method: "POST",
-    //       headers: headers,
-    //       body: JSON.stringify(body),
-    //     }
-    //   );
-      console.log(selectedSlot);
-      
-        const session = await createPaymentIntentAPI(selectedSlot);
-      console.log("session: ", session);
-      
-    //   const session = await response.json();
+      const session = await createPaymentIntentAPI(selectedSlot);
 
       const result = stripe?.redirectToCheckout({
         sessionId: session.id,
       });
-
-      console.log("Result after payment, result: ", result);
       
       setIsModalOpen(false);
       // Refresh slots
@@ -151,7 +128,7 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <BookOpen className="h-4 w-4" />
                       <span>
-                        {slot.title} - {slot.level}
+                        {slot.subject} - {slot.level}
                       </span>
                     </CardTitle>
                     <CardDescription>
@@ -207,7 +184,7 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
                   <div className="flex items-center gap-2 text-sm">
                     <BookOpen className="h-4 w-4 text-gray-500" />
                     <span>
-                      {selectedSlot.title} - {selectedSlot.level}
+                      {selectedSlot.subject} - {selectedSlot.level}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
