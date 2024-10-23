@@ -28,7 +28,7 @@ const TutorAppointmentDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editingSlot, setEditingSlot] = useState<TutorSlot | null>(null);
-
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   const [subject, setSubject] = useState<string>("");
   const [level, setLevel] = useState<string>("");
@@ -36,6 +36,55 @@ const TutorAppointmentDetails: React.FC = () => {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [price, setPrice] = useState<string>("");
+
+  // Get minimum date (today)
+  const getMinDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Generate time slots in 30-minute intervals
+  const generateTimeSlots = () => {
+    const slots = [];
+    const current = new Date();
+    const startHour = current.getHours();
+    const startMinute = current.getMinutes();
+    
+    // Round up to the next 30-minute interval and add 2 hours
+    let baseMinutes = Math.ceil((startHour * 60 + startMinute) / 30) * 30 + 120;
+    
+    for (let minutes = baseMinutes; minutes < 24 * 60; minutes += 30) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      const timeString = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+      slots.push(timeString);
+    }
+    
+    return slots;
+  };
+
+  const validateForm = (): boolean => {
+    const errors: {[key: string]: string} = {};
+
+    if (!subject) errors.subject = "Subject is required";
+    if (!level) errors.level = "Level is required";
+    if (!date) errors.date = "Date is required";
+    if (!startTime) errors.startTime = "Start time is required";
+    if (!endTime) errors.endTime = "End time is required";
+    if (!price) errors.price = "Price is required";
+    
+    if (startTime && endTime) {
+      const start = new Date(`1970-01-01T${startTime}`);
+      const end = new Date(`1970-01-01T${endTime}`);
+      
+      if (end <= start) {
+        errors.endTime = "End time must be after start time";
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -55,13 +104,14 @@ const TutorAppointmentDetails: React.FC = () => {
     };
     fetchSubjects();
   }, []);
-  
 
   const handleSubjectChange = (selectedSubject: string) => {
     setSubject(selectedSubject);
+    setValidationErrors(prev => ({ ...prev, subject: "" }));
     const subjectDetails = subjects.find(sub => sub.name === selectedSubject);
     if (subjectDetails) {
       setLevel(subjectDetails.level);
+      setValidationErrors(prev => ({ ...prev, level: "" }));
     }
   };
 
@@ -74,6 +124,7 @@ const TutorAppointmentDetails: React.FC = () => {
     setPrice("");
     setEditingSlot(null);
     setIsEditMode(false);
+    setValidationErrors({});
   };
 
   const handleOpenEdit = (slot: TutorSlot) => {
@@ -85,11 +136,16 @@ const TutorAppointmentDetails: React.FC = () => {
     setStartTime(slot.startTime);
     setEndTime(slot.endTime);
     setPrice(slot.price.toString());
+    setValidationErrors({});
     setIsModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     const slotData = {
       subject,
@@ -134,6 +190,8 @@ const TutorAppointmentDetails: React.FC = () => {
     });
   };
 
+  const timeSlots = generateTimeSlots();
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -156,11 +214,13 @@ const TutorAppointmentDetails: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Subject</label>
+                  <label className="text-sm font-medium">Subject *</label>
                   <select
                     value={subject}
                     onChange={(e) => handleSubjectChange(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 p-2 bg-white"
+                    className={`w-full rounded-md border p-2 bg-white ${
+                      validationErrors.subject ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     required
                   >
                     <option value="">Select subject</option>
@@ -170,14 +230,22 @@ const TutorAppointmentDetails: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                  {validationErrors.subject && (
+                    <p className="text-red-500 text-sm">{validationErrors.subject}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Level</label>
+                  <label className="text-sm font-medium">Level *</label>
                   <select
                     value={level}
-                    onChange={(e) => setLevel(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 p-2 bg-white"
+                    onChange={(e) => {
+                      setLevel(e.target.value);
+                      setValidationErrors(prev => ({ ...prev, level: "" }));
+                    }}
+                    className={`w-full rounded-md border p-2 bg-white ${
+                      validationErrors.level ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     required
                   >
                     <option value="">Select level</option>
@@ -187,53 +255,100 @@ const TutorAppointmentDetails: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                  {validationErrors.level && (
+                    <p className="text-red-500 text-sm">{validationErrors.level}</p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Select Date</label>
+                <label className="text-sm font-medium">Select Date *</label>
                 <Input
                   type="date"
                   value={date instanceof Date && !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : ''}
-                  onChange={(e) => setDate(new Date(e.target.value))}
-                  className="w-full"
+                  onChange={(e) => {
+                    setDate(new Date(e.target.value));
+                    setValidationErrors(prev => ({ ...prev, date: "" }));
+                  }}
+                  min={getMinDate()}
+                  className={`w-full ${validationErrors.date ? 'border-red-500' : ''}`}
                   required
                 />
+                {validationErrors.date && (
+                  <p className="text-red-500 text-sm">{validationErrors.date}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Start Time</label>
-                  <Input
-                    type="time"
+                  <label className="text-sm font-medium">Start Time *</label>
+                  <select
                     value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
+                    onChange={(e) => {
+                      setStartTime(e.target.value);
+                      setValidationErrors(prev => ({ ...prev, startTime: "" }));
+                    }}
+                    className={`w-full rounded-md border p-2 bg-white ${
+                      validationErrors.startTime ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     required
-                  />
+                  >
+                    <option value="">Select start time</option>
+                    {timeSlots.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                  {validationErrors.startTime && (
+                    <p className="text-red-500 text-sm">{validationErrors.startTime}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">End Time</label>
-                  <Input
-                    type="time"
+                  <label className="text-sm font-medium">End Time *</label>
+                  <select
                     value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
+                    onChange={(e) => {
+                      setEndTime(e.target.value);
+                      setValidationErrors(prev => ({ ...prev, endTime: "" }));
+                    }}
+                    className={`w-full rounded-md border p-2 bg-white ${
+                      validationErrors.endTime ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     required
-                  />
+                  >
+                    <option value="">Select end time</option>
+                    {timeSlots.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                  {validationErrors.endTime && (
+                    <p className="text-red-500 text-sm">{validationErrors.endTime}</p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Price (₹INR)</label>
+                <label className="text-sm font-medium">Price (₹INR) *</label>
                 <Input
                   type="number"
                   placeholder="Enter price"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => {
+                    setPrice(e.target.value);
+                    setValidationErrors(prev => ({ ...prev, price: "" }));
+                  }}
                   min="0"
                   step="0.01"
+                  className={`w-full ${validationErrors.price ? 'border-red-500' : ''}`}
                   required
                 />
+                {validationErrors.price && (
+                  <p className="text-red-500 text-sm">{validationErrors.price}</p>
+                )}
               </div>
 
               <Button type="submit" className="w-full">

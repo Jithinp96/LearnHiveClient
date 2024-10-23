@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Star, Menu, X, Search } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { fetchAllCoursesAPI, fetchCategoriesAPI } from '@/api/studentAPI/studentAPI';
+import { fetchAllCoursesAPI, fetchCategoriesAPI, getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
+import { RootState } from '@/redux/store';
 
 interface Category {
     _id: string;
@@ -29,11 +31,15 @@ const AllCourseList: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [purchasedCourses, setPurchasedCourses] = useState<string[]>([]);
+
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const navigate = useNavigate();
+
+    const { studentInfo } = useSelector((state: RootState) => state.student);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -45,6 +51,14 @@ const AllCourseList: React.FC = () => {
                 setCourses(coursesResponse?.data);
                 setFilteredCourses(coursesResponse?.data);
                 setCategories(categoriesResponse?.data);
+
+                if (studentInfo?._id) {
+                    const purchasedResponse = await getCourseOrderDetailsAPI();
+                    console.log("purchasedResponse: ", purchasedResponse);
+                    
+                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId));
+                }
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -68,7 +82,11 @@ const AllCourseList: React.FC = () => {
     };
 
     const handleViewCourse = (courseId: string) => {
-        navigate(`/course/${courseId}`);
+        if (purchasedCourses.includes(courseId)) {
+            navigate(`/course-view/${courseId}`);
+        } else {
+            navigate(`/course/${courseId}`);
+        }
     };
 
     const handleCategoryChange = (categoryId: string) => {
@@ -174,11 +192,11 @@ const AllCourseList: React.FC = () => {
                                     <span className="font-bold text-xl">
                                         ₹{course.price.toFixed(2)}
                                     </span>
-                                    <Button 
+                                    <Button
                                         className="bg-yellow-500 text-white px-4 py-2 rounded"
                                         onClick={() => handleViewCourse(course._id)}
                                     >
-                                        View Course
+                                        {purchasedCourses.includes(course._id) ? 'Go to Course' : 'View Course'}
                                     </Button>
                                 </div>
                             </div>

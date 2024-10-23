@@ -58,14 +58,14 @@ const TutorNavbar : React.FC = () => {
             isOpen ? 'block' : 'hidden'
           }`}
         >
-          <a href="/dashboard" className="block text-white px-4 py-2 md:inline">
+          <a href="/tutor/dashboard" className="block text-white px-4 py-2 md:inline">
             Home
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
+          <a href="/tutor/course-list" className="block text-white px-4 py-2 md:inline">
             Courses
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
-            Services
+          <a href="/tutor/appointment" className="block text-white px-4 py-2 md:inline">
+            Appointments
           </a>
           <a href="#" className="block text-white px-4 py-2 md:inline">
             Contact

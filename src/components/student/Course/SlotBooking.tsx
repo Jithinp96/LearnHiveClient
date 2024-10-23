@@ -3,25 +3,10 @@ import { useParams } from "react-router-dom";
 import { Calendar, Clock, IndianRupee, BookOpen } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  createPaymentIntentAPI,
-  getTutorSlotsAPI,
-} from "@/api/studentAPI/studentAPI";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { createPaymentIntentAPI, getTutorSlotsAPI } from "@/api/studentAPI/studentAPI";
 
 interface TimeSlot {
   _id: string;
@@ -45,12 +30,23 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const { tutorId } = useParams();
 
+  const isSlotExpired = (date: string, endTime: string) => {
+    const currentDate = new Date();
+    const [hours, minutes] = endTime.split(':').map(Number);
+    const slotDate = new Date(date);
+    slotDate.setHours(hours, minutes, 0);
+    return currentDate > slotDate;
+  };
+
   useEffect(() => {
     const fetchSlots = async () => {
       if (!tutorId) return;
       try {
         const response = await getTutorSlotsAPI(tutorId);
-        setAvailableSlots(response?.data);
+        const validSlots = response?.data.filter(
+          (slot: TimeSlot) => !isSlotExpired(slot.date, slot.endTime)
+        );
+        setAvailableSlots(validSlots);
       } catch (error) {
         console.error("Error fetching slots:", error);
       }
@@ -59,15 +55,31 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
     if (tutorId) {
       fetchSlots();
     }
+
+    const intervalId = setInterval(() => {
+      setAvailableSlots(prevSlots => 
+        prevSlots.filter(slot => !isSlotExpired(slot.date, slot.endTime))
+      );
+    }, 60000);
+
+    return () => clearInterval(intervalId);
   }, [tutorId]);
 
   const handleBookNow = (slot: TimeSlot) => {
+    if (isSlotExpired(slot.date, slot.endTime)) {
+      return;
+    }
     setSelectedSlot(slot);
     setIsModalOpen(true);
   };
 
   const handlePayNow = async () => {
     if (!selectedSlot) return;
+    if (isSlotExpired(selectedSlot.date, selectedSlot.endTime)) {
+      setIsModalOpen(false);
+      setSelectedSlot(null);
+      return;
+    }
     try {
       const stripe_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
       const stripe = await loadStripe(stripe_key);
@@ -78,7 +90,6 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
       });
       
       setIsModalOpen(false);
-      // Refresh slots
     } catch (error) {
       console.error("Payment failed:", error);
     }
@@ -93,7 +104,6 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
     });
   };
 
-  // Group slots by date
   const slotsByDate = availableSlots.reduce((acc, slot) => {
     const date = new Date(slot.date).toDateString();
     if (!acc[date]) {

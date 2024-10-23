@@ -82,7 +82,7 @@ const Navbar: React.FC = () => {
           </a>
           {isStudentAuthenticated && studentInfo && (
             <>
-              <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+              <a href="mycourses" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
               <Library className="h-5 w-5" />
               <span>Your Courses</span>
           </a>
