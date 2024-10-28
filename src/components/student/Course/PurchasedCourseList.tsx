@@ -4,16 +4,9 @@ import { Clock, Star } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
-import { getCourseOrderDetailsAPI, fetchCoursesDetailsAPI } from '@/api/studentAPI/studentAPI';
+import { getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import { RootState } from '@/redux/store';
-
-interface OrderDetails {
-    _id: string;
-    courseId: string;
-    progress: number;
-    amount: number;
-    paymentId: string;
-}
+import toast from 'react-hot-toast';
 
 interface Course {
     _id: string;
@@ -31,7 +24,7 @@ interface Course {
 
 interface PurchasedCourse {
     _id: string;
-    data: Course;
+    courseId: Course;
     orderId?: string;
     progress?: number;
     paymentId?: string;
@@ -50,24 +43,11 @@ const PurchasedCourses: React.FC = () => {
             try {
                 if (studentInfo?._id) {
                     setIsLoading(true);
-
                     const orderDetails = await getCourseOrderDetailsAPI();
-
-                    const coursesPromises = orderDetails.map(async (order: OrderDetails) => {
-                        try {
-                            const courseDetails = await fetchCoursesDetailsAPI(order.courseId);
-                            return courseDetails
-                        } catch (error) {
-                            console.error(`Error fetching course ${order.courseId}:`, error);
-                            return null;
-                        }
-                    });
-
-                    const resolvedCourses = (await Promise.all(coursesPromises)).filter((course): course is PurchasedCourse => course !== null);
-                    setCourses(resolvedCourses);
+                    setCourses(orderDetails);
                 }
             } catch (error) {
-                console.error('Error fetching purchased courses:', error);
+                toast.error("Error fetching purchased courses. Please try again!")
             } finally {
                 setIsLoading(false);
             }
@@ -109,8 +89,8 @@ const PurchasedCourses: React.FC = () => {
                         {courses.map((course) => (
                             <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
                                 <img 
-                                    src={course.data.thumbnailUrl} 
-                                    alt={course.data.title} 
+                                    src={course.courseId.thumbnailUrl} 
+                                    alt={course.courseId.title} 
                                     className="w-full h-48 object-cover" 
                                     onError={(e) => {
                                         const target = e.target as HTMLImageElement;
@@ -118,27 +98,27 @@ const PurchasedCourses: React.FC = () => {
                                     }}
                                 />
                                 <div className="p-4 flex-grow">
-                                <span className="text-xs font-semibold text-gray-500">{course.data.category.name}</span>
-                                    <h2 className="text-xl font-semibold mb-2">{course.data.title}</h2>
-                                    <div className="flex items-center text-sm text-gray-600 mb-2">
-                                        <span className="mr-4">{course.data.level}</span>
-                                        <Clock size={16} className="mr-1" />
-                                        <span>{course.data.duration} Hours</span>
+                                    <span className="text-xs font-semibold text-gray-500">{course.courseId.category.name}</span>
+                                        <h2 className="text-xl font-semibold mb-2">{course.courseId.title}</h2>
+                                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                                            <span className="mr-4">{course.courseId.level}</span>
+                                            <Clock size={16} className="mr-1" />
+                                            <span>{course.courseId.duration} Hours</span>
+                                        </div>
+                                        <div className="flex items-center text-sm">
+                                            <Star size={16} className="text-yellow-500 mr-1" />
+                                            <span>{course.courseId.rating || 'No rating yet'} ({course.courseId.reviews.length} reviews)</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center text-sm">
-                                        <Star size={16} className="text-yellow-500 mr-1" />
-                                        <span>{course.data.rating || 'No rating yet'} ({course.data.reviews.length} reviews)</span>
+                                    <div className="p-4 bg-gray-100">
+                                        <Button
+                                            className="w-full bg-blue-600 text-white"
+                                            onClick={() => handleContinueLearning(course.courseId._id)}
+                                        >
+                                            Continue Learning
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="p-4 bg-gray-100">
-                                    <Button
-                                        className="w-full bg-blue-600 text-white"
-                                        onClick={() => handleContinueLearning(course.data._id)}
-                                    >
-                                        Continue Learning
-                                    </Button>
-                                </div>
-                            </div>
                         ))}
                     </div>
                 )}

@@ -1,60 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const EmailInput: React.FC<{ onSubmit: (email: string) => void }> = ({ onSubmit }) => {
-    const [email, setEmail] = useState('');
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        onSubmit(email);
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="w-full max-w-md">
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-4 py-2 mb-4 text-lg border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                required
-            />
-            <button 
-                type="submit"
-                className="w-full bg-[#FF4B2B] text-white rounded-[20px] border-0 py-3 px-[45px] text-xs font-bold uppercase tracking-[1px] transition-all duration-80 ease-in hover:bg-[#FF416C] active:scale-95 focus:outline-none"
-            >
-                Reset Password
-            </button>
-        </form>
-    );
-};
+import FloatingLabelInput from '@/components/ui/FloatingInput';
+import AuthPageButton from '@/components/ui/AuthPageButton';
 
 const ForgotPassword: React.FC = () => {
+    const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (email: string) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setIsSubmitting(true);
         setMessage('');
         setIsError(false);
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/students/forgot-password`, {
-            email: email
-        }, {
-            withCredentials: true
-        });
+                email
+            }, {
+                withCredentials: true
+            });
 
-        if (response.status >= 200 && response.status < 300) {
-            setMessage('Password reset link sent to your email.');
-        } else {
-            setIsError(true);
-            setMessage(response.data.message || 'An unexpected error occurred');
-        }
+            if (response.status >= 200 && response.status < 300) {
+                setMessage('Password reset link sent to your email.');
+            } else {
+                setIsError(true);
+                setMessage(response.data.message || 'An unexpected error occurred');
+            }
         } catch (error) {
             setIsError(true);
             if (axios.isAxiosError(error)) {
@@ -75,12 +51,29 @@ const ForgotPassword: React.FC = () => {
                     <div className="w-full max-w-md p-8">
                         <h2 className="text-3xl font-bold text-center mb-8">Forgot Password</h2>
                         <p className="text-center mb-8">Enter your email to receive a password reset link.</p>
-                        <EmailInput onSubmit={handleSubmit} />
-                        {message && (
-                            <p className={`mt-4 text-center ${isError ? 'text-red-500' : 'text-green-600'}`}>{message}</p>
-                        )}
-                        {isSubmitting && (
-                            <p className="text-center mt-4 text-blue-600">Sending reset link...</p>
+                        
+                        <form onSubmit={handleSubmit} className="w-full">
+                            <FloatingLabelInput
+                                label="Email"
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                disabled={isSubmitting}
+                            />
+                            
+                            <AuthPageButton 
+                                variant='primary'
+                                type="submit"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Sending...' : 'Reset Password'}
+                            </AuthPageButton>
+                        </form>
+
+                        {!isError && message && (
+                            <p className="text-center mt-4 text-green-600">{message}</p>
                         )}
                     </div>
                 </div>
@@ -93,11 +86,12 @@ const ForgotPassword: React.FC = () => {
                             <p className="text-lg font-[100] leading-5 tracking-[0.5px] mb-5">
                                 Enter your email to reset your password and regain access to your account.
                             </p>
-                            <button 
+                            <AuthPageButton
+                                variant='secondary'
                                 onClick={() => navigate('/auth')}
-                                className="rounded-[20px] border border-solid border-white bg-transparent text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                            >
                                 Back to Login
-                            </button>
+                            </AuthPageButton>
                         </div>
                     </div>
                 </div>

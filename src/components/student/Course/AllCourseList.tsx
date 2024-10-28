@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fetchAllCoursesAPI, fetchCategoriesAPI, getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import { RootState } from '@/redux/store';
+import toast from 'react-hot-toast';
 
 interface Category {
     _id: string;
@@ -54,13 +55,11 @@ const AllCourseList: React.FC = () => {
 
                 if (studentInfo?._id) {
                     const purchasedResponse = await getCourseOrderDetailsAPI();
-                    console.log("purchasedResponse: ", purchasedResponse);
-                    
-                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId));
+                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId._id));
                 }
 
             } catch (error) {
-                console.error('Error fetching data:', error);
+                toast.error("Error loading course list. Please try again!")
             }
         };
 

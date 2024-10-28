@@ -46,7 +46,7 @@ const Profile: React.FC = () => {
         const fetchStudentDetails = async (studentId: string) => {
             try {
                 const response = await getStudentDetailsAPI(studentId);
-                setStudentDetails(response.data);
+                setStudentDetails(response.data.data);
                 setLoading(false);
             } catch (error) {
                 setError("Failed to fetch student details");
@@ -63,7 +63,7 @@ const Profile: React.FC = () => {
 
         try {
             const updatedStudent = await addStudentEducationAPI(studentInfo._id, educationData);
-            setStudentDetails(updatedStudent?.data);
+            setStudentDetails(updatedStudent?.data.data);
         } catch (error) {
             setError("Failed to update education");
         }
@@ -74,7 +74,7 @@ const Profile: React.FC = () => {
 
         try {
             const updatedStudent = await deleteStudentEducationAPI(studentInfo._id, educationId);
-            setStudentDetails(updatedStudent?.data);
+            setStudentDetails(updatedStudent?.data.data);
         } catch (error) {
             setError("Failed to delete education");
         }
@@ -85,7 +85,7 @@ const Profile: React.FC = () => {
 
         try {
             const updatedStudent = await editStudentEducationAPI(studentInfo._id, editedEducation._id, editedEducation);
-            setStudentDetails(updatedStudent?.data);
+            setStudentDetails(updatedStudent?.data.data);
         } catch (error) {
             setError("Failed to edit education");
         }
@@ -95,17 +95,10 @@ const Profile: React.FC = () => {
         if (!studentInfo?._id) return;
 
         try {
-            console.log("Inside handle name update in profile.tsx");
-            console.log("newName: ", newName);
-            console.log("studentInfo._id: ", studentInfo._id);
-            
             const updatedStudent = await updateStudentNameAPI(studentInfo._id, newName);
-
-            console.log("updatedStudent after name: ", updatedStudent);
-            
             setStudentDetails(prevDetails => ({
                 ...prevDetails!,
-                name: updatedStudent?.data.name
+                name: updatedStudent?.data.data.name
             }));
         } catch (error) {
             setError("Failed to update name");
@@ -119,7 +112,7 @@ const Profile: React.FC = () => {
             const updatedStudent = await updateStudentProfileImageAPI(studentInfo._id, newImageFile);
             setStudentDetails(prevDetails => ({
                 ...prevDetails!,
-                profileImage: updatedStudent.data.profileImage
+                profileImage: updatedStudent.data.data.profileImage
             }));
         } catch (error) {
             setError("Failed to update profile image");
@@ -133,7 +126,7 @@ const Profile: React.FC = () => {
             const updatedStudent = await updateStudentMobileAPI(studentInfo._id, newMobile);
             setStudentDetails(prevDetails => ({
                 ...prevDetails!,
-                mobile: updatedStudent?.data.mobile
+                mobile: updatedStudent?.data.data.mobile
             }));
         } catch (error) {
             setError("Failed to update mobile number");

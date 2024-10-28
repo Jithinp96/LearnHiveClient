@@ -1,16 +1,16 @@
 import React from "react";
 import Navbar from "../../components/student/Bars/Navbar";
 import Footer from "../../components/student/Bars/Footbar";
-import StudentDashboard from "@/components/student/Dashboard/StudentDahsboard";
+import CourseOrderList from "@/components/student/Order/CourseOrderList";
 
-const DashboardPage: React.FC = () => {
-    return(
+const CourseOrderListPage: React.FC = () => {
+    return (
         <>
             <Navbar />
-            <StudentDashboard />
+            <CourseOrderList />
             <Footer />
         </>
     )
 }
 
-export default DashboardPage
+export default CourseOrderListPage

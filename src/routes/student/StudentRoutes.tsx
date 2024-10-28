@@ -17,9 +17,12 @@ import TutorProfilePage from "@/pages/student/TutorProfilePage";
 import SlotBookingPage from "@/pages/student/SlotBookingPage";
 import PaymentSuccessPage from "@/pages/student/PaymentSuccessPage";
 import PaymentFailurePage from "@/pages/student/PaymentFailurePage";
-import OrderListPage from "@/pages/student/OrderListPage";
+import CourseOrderListPage from "@/pages/student/CourseOrderListPage";
 import CourseViewerPage from "@/pages/student/CourseViewerPage";
 import PurchasedCourseListPage from "@/pages/student/PurchasedCourseListPage";
+import VideoCallRoomPage from "@/pages/communication/VideoCallRoomPage";
+import VideoCallEntryPage from "@/pages/communication/VideoCallEntryPage";
+import SlotOrderListPage from "@/pages/student/SlotOrderListPage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -41,13 +44,17 @@ const StudentRoutes: React.FC = () => {
         <Route path="/slotbooking/:tutorId" element={<SlotBookingPage />} />
         <Route path="/paymentsuccess" element={<PaymentSuccessPage />} />
         <Route path="/paymentfailure" element={<PaymentFailurePage />} />
-        <Route path="/orders" element={<OrderListPage />} />
+        <Route path="/course-orders" element={<CourseOrderListPage />} />
+        <Route path="/slot-orders" element={<SlotOrderListPage />} />
         <Route path="/mycourses" element={<PurchasedCourseListPage />} />
         <Route path="/course-view/:id" element={<CourseViewerPage />} />
+        
       </Route>
       
       <Route path="/allcourses" element={<AllCourseListPage />} />
       <Route path="/course/:id" element={<CourseDetailPage />} />
+      <Route path="/room" element={<VideoCallEntryPage />} />
+        <Route path="/room/:id" element={<VideoCallRoomPage />} />
     </Routes>
   );
 };

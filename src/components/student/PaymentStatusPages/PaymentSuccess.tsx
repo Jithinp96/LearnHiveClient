@@ -1,4 +1,4 @@
-import { Check, ArrowLeft, Home } from 'lucide-react';
+import { Check, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -19,31 +19,13 @@ const PaymentSuccess = () => {
             Thank you for your payment. Your transaction has been completed successfully.
           </p>
           
-          <div className="text-left w-full bg-green-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600 mb-2">
-              Transaction ID: <span className="font-medium">TXN_123456789</span>
-            </p>
-            <p className="text-sm text-gray-600">
-              Amount Paid: <span className="font-medium">$99.99</span>
-            </p>
-          </div>
-          
-          <div className="flex gap-4 w-full">
-            <Button 
-              variant="outline"
-              className="flex-1 flex items-center justify-center gap-2"
-              onClick={() => window.history.back()}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Go Back
-            </Button>
-            
+          <div className="flex gap-4 w-full">  
             <Button 
               className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700"
               onClick={() => window.location.href = '/dashboard'}
             >
               <Home className="w-4 h-4" />
-              Home
+              Dashboard
             </Button>
           </div>
         </CardContent>

@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import ErrorMessage from '@/components/ui/ErrorMessage';
+import { validateSignInForm } from "@/utils/Validations";
+import FloatingLabelInput from "@/components/ui/FloatingInput";
+import AuthPageButton from "@/components/ui/AuthPageButton";
 
 interface SignInProps {
   onSignIn: (email: string, password: string) => void;
@@ -6,33 +10,81 @@ interface SignInProps {
   loading: boolean;
 }
 
-const StudentSignInForm: React.FC<SignInProps> = ({ onSignIn, errorMessage, loading }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const StudentSignInForm: React.FC<SignInProps> = ({
+  onSignIn,
+  errorMessage: serverErrorMessage,
+  loading,
+}) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSignIn(email, password)
-  }
-    return (
-      <div className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
-        <img  className='h-16' src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/Logo.png" alt="Logo" />
-        <h1 className="text-2xl font-bold m-4">Student Sign In</h1>
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-        <form onSubmit={handleSubmit}>
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full" />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full" />
-          <a href="/forgot-password" className="text-[#333] text-sm no-underline mt-[15px]">Forgot your password?</a><br/>
-          <button
-            className="rounded-[20px] border border-solid border-[#FF4B2B] bg-[#FF4B2B] text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in mt-[15px] active:scale-95 focus:outline-none"
-            disabled={loading}
-          >
-            {loading ? 'Signing In...' : 'Sign In'}
-          </button>
+
+    setValidationError("");
+
+    const validation = validateSignInForm(email, password);
+    if (!validation.isValid) {
+      setValidationError(validation.errorMessage);
+      return;
+    }
+
+    onSignIn(email, password);
+  };
+
+  return (
+    <div className="bg-white flex items-center justify-center flex-col px-[50px] h-full text-center">
+      <img
+        className="h-16"
+        src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/Logo.png"
+        alt="Logo"
+      />
+      <h1 className="text-2xl font-bold m-4">Student Sign In</h1>
+      
+      <ErrorMessage message={serverErrorMessage || undefined} />
+      
+      <ErrorMessage message={validationError} />
+      
+      <form onSubmit={handleSubmit} className="w-full space-y-4">
+        <FloatingLabelInput
+          label="Email"
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setValidationError("");
+          }}
+        />
         
-        </form>
-      </div>
-    );
+        <FloatingLabelInput
+          label="Password"
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setValidationError("");
+          }}
+        />
+
+        <a
+          href="/forgot-password"
+          className="text-[#333] text-sm no-underline block"
+        >
+          Forgot your password?
+        </a>
+        
+        <AuthPageButton
+          disabled={loading}
+          type="submit"
+        >
+          {loading ? "Signing In..." : "Sign In"}
+        </AuthPageButton>
+      </form>
+    </div>
+  );
 };
 
-export default StudentSignInForm
+export default StudentSignInForm;

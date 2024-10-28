@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const OTPInput: React.FC<{ onComplete: (otp: string) => void }> = ({ onComplete }) => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
@@ -109,9 +110,10 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
         if (response.status >= 200 && response.status < 300) {
           
           if (response.data.success) {
-            console.log('OTP verified successfully');
+            toast.success("Registration Successfull. Please login now!")
             navigate(registrationType === 'student' ? '/auth' : '/tutor/auth')
           } else {
+            toast.error("Invalid OTP. Please try again!")
             console.log('OTP verification failed:', response.data.message);
             setErrorMessage(response.data.message || 'Invalid OTP');
           }
@@ -125,6 +127,8 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
         console.error('Error during OTP verification:', error);
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || 'Network error';
+          console.log("Here");
+          
           setErrorMessage(errorMessage);
         } else {
           setErrorMessage('An unknown error occurred');

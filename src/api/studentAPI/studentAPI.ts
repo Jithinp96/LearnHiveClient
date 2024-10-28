@@ -274,8 +274,6 @@ export const createCoursePaymentIntentAPI = async (courseDetails: object) => {
 export const getCourseOrderDetailsAPI = async () => {
     try {
         const response = await axiosInstance.get(`/students/course-orders`)
-        // console.log("course response: ", response.data);
-        
         return response.data
     } catch (error) {
         console.error("Error in getCourseOrderDetailsAPI:", error);
@@ -285,7 +283,6 @@ export const getCourseOrderDetailsAPI = async () => {
 export const getSlotOrderDetailsAPI = async () => {
     try {
         const response = await axiosInstance.get(`/students/slot-orders`)
-        // console.log("slot response: ", response.data);
         return response.data
     } catch (error) {
         console.error("Error in getSLotOrderDetailsAPI:", error);

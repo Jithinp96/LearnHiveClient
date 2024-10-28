@@ -8,9 +8,9 @@ import {
   ShoppingCart, 
   Library, 
   Home, 
-  BookOpen, 
-  Settings, 
-  Phone
+  BookOpen,
+  Phone,
+  Video
 } from 'lucide-react';
 
 const Navbar: React.FC = () => {
@@ -72,9 +72,9 @@ const Navbar: React.FC = () => {
             <BookOpen className="h-5 w-5" />
             <span>Courses</span>
           </a>
-          <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
-            <Settings className="h-5 w-5" />
-            <span>Services</span>
+          <a href="/room" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <Video className="h-5 w-5" />
+            <span>Video Call</span>
           </a>
           <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
             <Phone className="h-5 w-5" />
@@ -122,6 +122,18 @@ const Navbar: React.FC = () => {
                       onClick={() => navigate('/profile')}
                     >
                       Profile
+                    </li>
+                    <li
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center space-x-2"
+                      onClick={() => navigate('/course-orders')}
+                    >
+                      Your Orders
+                    </li>
+                    <li
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center space-x-2"
+                      onClick={() => navigate('/slot-orders')}
+                    >
+                      Your Appointments
                     </li>
                     <li 
                       className="px-4 py-2 hover:bg-gray-200 cursor-pointer flex items-center space-x-2" 
