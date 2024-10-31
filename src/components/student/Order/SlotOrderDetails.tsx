@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare } from 'lucide-react';
-import { getSlotOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import toast from 'react-hot-toast';
+import { MessageSquare } from 'lucide-react';
+
+import { cancelSlotOrderAPI, getSlotOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
+import ConfirmActionDialog from '@/components/ui/ConfirmationBox';
 
 interface Slot {
     subject: string,
@@ -17,24 +19,46 @@ interface Order {
     address: string;
     createdAt: string;
     amount: number;
-    paymentStatus: string;
+    sessionStatus: string;
 }
 
 const SlotOrderList: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [isCanceling, setIsCanceling] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
                 const response = await getSlotOrderDetailsAPI();
+                console.log("response: ", response);
                 setOrders(response);
             } catch (error) {
-                toast.error("Failed to fetch slot order. Please try again!")
+                toast.error("Failed to fetch slot orders. Please try again!");
             }
         };
-    
+
         fetchOrders();
     }, []);
+
+    const handleCancelOrder = async (orderId: string) => {
+        try {
+            setIsCanceling(prev => ({ ...prev, [orderId]: true }));
+            await cancelSlotOrderAPI(orderId);
+            toast.success("Slot cancelled and refund initiated!");
+
+            setOrders(prevOrders => prevOrders.filter(order => order._id !== orderId));
+        } catch (error) {
+            toast.error("Failed to cancel the slot. Please try again.");
+        } finally {
+            setIsCanceling(prev => ({ ...prev, [orderId]: false }));
+        }
+    };
+
+    const handleDelete = (id: string) => {
+        console.log("Id got: ", id);
+        
+        handleCancelOrder(id);
+    };
 
     return (
         <div className="p-6 max-w-7xl mx-auto">
@@ -65,14 +89,28 @@ const SlotOrderList: React.FC = () => {
                 <div className="grid grid-cols-12 p-4 border-b text-gray-500 font-medium">
                     <div className="col-span-3">Details</div>
                     <div className="col-span-3">Slot Date</div>
-                    <div className="col-span-3">Purchase Date</div>
+                    <div className="col-span-2">Purchase Date</div>
                     <div className="col-span-2">Price</div>
-                    <div className="col-span-1">Payment Status</div>
+                    <div className="col-span-1">Session Status</div>
+                    <div className="col-span-1">Action</div>
                 </div>
 
                 {orders.map((order) => {
                     const uniqueKey = `${order._id}-${order.slotId.subject}`;
-                    
+
+                    const getStatusClasses = () => {
+                        switch (order.sessionStatus) {
+                            case 'Completed':
+                                return 'bg-green-50 text-green-600';
+                            case 'Scheduled':
+                                return 'bg-blue-50 text-blue-600';
+                            case 'Cancelled':
+                                return 'bg-red-50 text-red-600';
+                            default:
+                                return 'bg-gray-50 text-gray-600';
+                        }
+                    };
+
                     return (
                         <div key={uniqueKey} className="grid grid-cols-12 p-4 border-b items-center hover:bg-gray-50">
                             <div className="col-span-3">
@@ -91,18 +129,26 @@ const SlotOrderList: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-span-3 text-gray-500">{order.createdAt}</div>
+                            <div className="col-span-2 text-gray-500">{order.createdAt}</div>
                             <div className="col-span-2 font-medium">₹{order.amount}</div>
                             <div className="col-span-1 flex items-center justify-between">
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm ${
-                                    order.paymentStatus === 'Success'
-                                        ? 'bg-green-50 text-green-600'
-                                        : 'bg-red-50 text-red-600'
-                                    }`}
-                                >
-                                    {order.paymentStatus}
+                                <span className={`px-3 py-1 rounded-full text-sm ${getStatusClasses()}`}>
+                                    {order.sessionStatus}
                                 </span>
+                            </div>
+                            <div className="col-span-1">
+                            <ConfirmActionDialog
+                                title="Cancel Slot Order"
+                                triggerElement={{
+                                    type: 'button',
+                                    content: 'Cancel',
+                                }}
+                                description="Are you sure you want to cancel this slot? This action cannot be undone."
+                                confirmText="Confirm Cancel"
+                                cancelText="Close"
+                                onConfirm={() => handleDelete(order._id)}
+                                variant="destructive"
+                            />
                             </div>
                         </div>
                     );

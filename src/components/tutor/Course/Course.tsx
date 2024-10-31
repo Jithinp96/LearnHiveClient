@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 import { RootState } from '@/redux/store';
 import { fetchTutorCoursesAPI } from '@/api/tutorAPI/tutorAxios';
 
@@ -20,14 +23,18 @@ const Course: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { tutorInfo } = useSelector((state: RootState) => state.tutor);
+    const navigate = useNavigate();
+
+    if(!tutorInfo) {
+        toast.error("Tutor info missing!")
+        return
+    }
 
     useEffect(() => {
         const fetchCourses = async () => {
             try {
                 setIsLoading(true);
                 const fetchedCourses = await fetchTutorCoursesAPI(tutorInfo?._id);
-                console.log("fetchedCourses in course.tsx: ", fetchedCourses.data);
-                
                 setCourses(fetchedCourses.data);
                 setIsLoading(false);
             } catch (err) {
@@ -38,6 +45,10 @@ const Course: React.FC = () => {
 
         fetchCourses();
     }, [tutorInfo?._id]);
+
+    const handleEdit = (courseId: string) => {
+        navigate(`/tutor/edit-course/${courseId}`);
+    };
 
     const getStatusColor = (status: boolean) => {
         switch (status) {
@@ -87,7 +98,11 @@ const Course: React.FC = () => {
                                             {course.isBlocked ? 'Blocked' : 'Active'}
                                         </td>
                                         <td>
-                                            <button className="text-blue-600 hover:text-blue-800">Edit</button>
+                                            <button 
+                                                onClick={() => handleEdit(course._id)}
+                                                className="text-blue-600 hover:text-blue-800"
+                                                disabled={course.isBlocked}
+                                            >Edit</button>
                                         </td>
                                     </tr>
                                 ))}

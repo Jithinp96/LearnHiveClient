@@ -4,14 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { logoutStudent } from '../../../redux/slices/studentSlice';
 import { logoutStudentAPI } from '../../../api/studentAPI/studentAPI';
-import { 
-  ShoppingCart, 
-  Library, 
-  Home, 
-  BookOpen,
-  Phone,
-  Video
-} from 'lucide-react';
+import { ShoppingCart, Library, Home, BookOpen, Phone, Video } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

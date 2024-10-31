@@ -288,3 +288,16 @@ export const getSlotOrderDetailsAPI = async () => {
         console.error("Error in getSLotOrderDetailsAPI:", error);
     }
 }
+
+export const cancelSlotOrderAPI = async (orderId: string) => {
+    try {
+        console.log("Reached cancel slot api");
+        
+        const response = await axiosInstance.post(`/students/slot-cancel/${orderId}`);
+        console.log("Response after cancelling slot: ", response);
+        
+        return response.data;
+    } catch (error) {
+        console.error("Error in cancelling slot: ", error)
+    }
+};

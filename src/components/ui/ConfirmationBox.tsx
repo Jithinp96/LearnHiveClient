@@ -18,7 +18,7 @@ type IconName = keyof typeof LucideIcons;
 interface ConfirmActionDialogProps {
   onConfirm: () => void;
   triggerElement: {
-    type: 'button' | 'icon';
+    type: 'button' | 'icon' | 'text';
     content: string;
     iconName?: IconName;
   };

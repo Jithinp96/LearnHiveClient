@@ -268,6 +268,46 @@ export const uploadThumbnailAPI = async(file: File) => {
     }
 }
 
+export const editCourseAPI = async(
+    courseId: string,
+    title: string,
+    description: string,
+    shortDescription: string,
+    tags: string[],
+    category: string,
+    price: number,
+    level: string,
+    thumbnailUrl: string,
+    duration: number,
+    videos: object[],
+) => {
+    try {
+        return await axiosInstance.put(`/tutor/edit-course/${courseId}`, {
+            courseId,
+            title,
+            description,
+            shortDescription,
+            tags,
+            category,
+            price,
+            level,
+            thumbnailUrl,
+            duration,
+            videos,
+        });
+    } catch (error) {
+        
+    }
+}
+
+export const fetchCourseByIdAPI = async(courseId: string) => {
+    try {
+        return await axiosInstance.get(`/tutor/edit-course/${courseId}`)
+    } catch (error) {
+        
+    }
+}
+
 export const fetchCategoriesAPI = async() => {
     try {
         const response = await axiosInstance.get('/tutor/getcategories');
@@ -307,6 +347,26 @@ export const createSlotAPI = async(slotData: object) => {
         throw error;
     }
 }
+
+export const generateSlotsAPI = async(data: { tutorId: string; subject: string; level: string; startTime: string; endTime: string; price: number, date: Date}) => {
+    try {
+        return await axiosInstance.post('/tutor/generate-slots', data);
+    } catch (error) {
+        console.error("Error in generating slots:", error);
+        throw error;
+    }
+};
+
+export const generateSlotsPreferenceAPI = async(data: { tutorId: string; subject: string; level: string; startTime: string; endTime: string; price: number, date: Date, requiresDailySlotCreation: boolean}) => {
+    try {
+        console.log("data from the generate slot preference api: ", data);
+        
+        return await axiosInstance.post('/tutor/generate-slots-preference', data);
+    } catch (error) {
+        console.error("Error in generating slots:", error);
+        throw error;
+    }
+};
 
 export const editSlotAPI = async(slotId: string, slotData: object) => {
     try {

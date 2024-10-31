@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/admin/course-category`;
 
@@ -124,6 +125,33 @@ export const getCourseList = async () => {
         )
     } catch (error) {
         throw error;
+    }
+}
+
+export const getCourseDetails = async (courseId: string) => {
+    try {
+        return await axiosInstance.get(`/admin/course/${courseId}`)
+    } catch (error) {
+        
+    }
+}
+
+export const approveCourseAPI = async(courseId: string) => {
+    try {
+        return await axiosInstance.put(`/admin/course/${courseId}/approval`)
+    } catch (error) {
+        
+    }
+}
+
+export const toggleBlockCourseAPI = async(courseId: string, isBlocked: boolean) => {
+    try {
+        return await axiosInstance.put(
+            `/admin/course/${courseId}/toggle-status`,
+            { isBlocked }
+        )
+    } catch (error) {
+        
     }
 }
 
