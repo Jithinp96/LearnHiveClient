@@ -301,3 +301,61 @@ export const cancelSlotOrderAPI = async (orderId: string) => {
         console.error("Error in cancelling slot: ", error)
     }
 };
+
+export const addReviewAPI = async (courseId: string, reviewData: { rating: number, comment: string, userId?: string }) => {
+    try {
+        const response = await axiosInstance.post(`/students/${courseId}/reviews`, reviewData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding review:', error);
+        throw error;
+    }
+};
+  
+export const updateReviewAPI = async (courseId: string, reviewId: string, reviewData: { rating?: number, comment?: string }) => {
+    try {
+        const response = await axiosInstance.put(`/students/${courseId}/reviews/${reviewId}`, reviewData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating review:', error);
+        throw error;
+    }
+};
+  
+export const deleteReviewAPI = async (courseId: string, reviewId: string) => {
+    try {
+        await axiosInstance.delete(`/students/${courseId}/reviews/${reviewId}`);
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        throw error;
+    }
+};
+
+export const addCommentAPI = async (courseId: string, commentData: { content: string, userId?: string }) => {
+    try {
+        const response = await axiosInstance.post(`/students/${courseId}/comments`, commentData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        throw error;
+    }
+};
+  
+export const updateCommentAPI = async (courseId: string, commentId: string, commentData: { content: string }) => {
+    try {
+        const response = await axiosInstance.put(`/students/${courseId}/comments/${commentId}`, commentData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating comment:', error);
+        throw error;
+    }
+};
+  
+export const deleteCommentAPI = async (courseId: string, commentId: string) => {
+    try {
+        await axiosInstance.delete(`/students/${courseId}/comments/${commentId}`);
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        throw error;
+    }
+};

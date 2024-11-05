@@ -1,32 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Play, Clock, Users, Star } from 'lucide-react';
+import { ChevronDown, ChevronUp, Play, Star } from 'lucide-react';
+
 import { fetchCoursesDetailsAPI } from '@/api/studentAPI/studentAPI';
-
-interface Video {
-  _id: string;
-  title: string;
-  duration: number;
-  url: string;
-  isCompleted?: boolean;
-}
-
-interface Course {
-  _id: string;
-  tutorId: { _id: string; name: string };
-  title: string;
-  description: string;
-  shortDescription: string;
-  price: number;
-  duration: number;
-  category: { _id: string; name: string };
-  videos: Video[];
-  level: string;
-  tags: string[];
-  thumbnailUrl: string;
-  reviews: any[];
-  purchaseCount: number;
-}
+import TabContent from './TabContent';
+import { Course } from '@/types/Course';
 
 const CourseViewer: React.FC = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -40,6 +18,7 @@ const CourseViewer: React.FC = () => {
     const fetchCourseDetails = async () => {
       try {
         const response = await fetchCoursesDetailsAPI(id ?? '');
+        console.log("response?.data: ", response?.data);
         setCourse(response?.data);
       } catch (error) {
         console.error('Failed to fetch course details:', error);
@@ -54,6 +33,11 @@ const CourseViewer: React.FC = () => {
 
   const activeVideo = course.videos[activeVideoIndex];
 
+  // Calculate average rating
+  const averageRating = course.reviews.length 
+    ? (course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length).toFixed(1)
+    : 'No ratings';
+
   return (
     <div className="flex h-screen bg-white">
       {/* Left Section - Video and Course Info */}
@@ -61,7 +45,7 @@ const CourseViewer: React.FC = () => {
         {/* Video Player Section */}
         <div className="relative aspect-video bg-gray-900 rounded-lg mb-6">
           <video
-            key={activeVideo._id} // Important: Forces video reload when source changes
+            key={activeVideo._id}
             src={activeVideo.url}
             className="w-full h-full rounded-lg"
             controls
@@ -79,7 +63,7 @@ const CourseViewer: React.FC = () => {
           <div className="flex items-center gap-6 text-gray-600 text-sm">
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-              <span className="font-bold">{course.reviews.length ? '4.7' : 'No ratings'}</span>
+              <span className="font-bold">{averageRating}</span>
               <span>({course.reviews.length} ratings)</span>
             </div>
           </div>
@@ -101,12 +85,7 @@ const CourseViewer: React.FC = () => {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'overview' && (
-          <div className="text-gray-600">
-            <h3 className="text-lg font-bold mb-2">About this course</h3>
-            <p>{course.description}</p>
-          </div>
-        )}
+        <TabContent activeTab={activeTab} course={course} />
       </div>
 
       {/* Right Section - Course Content */}

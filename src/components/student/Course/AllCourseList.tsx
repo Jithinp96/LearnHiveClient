@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Star, Menu, X, Search } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fetchAllCoursesAPI, fetchCategoriesAPI, getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import { RootState } from '@/redux/store';
-import toast from 'react-hot-toast';
 
 interface Category {
     _id: string;
