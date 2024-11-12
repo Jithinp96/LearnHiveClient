@@ -11,6 +11,7 @@ import AdminRoutes from "./routes/admin/AdminRoutes";
 
 // Public Page
 import HomePage from "./pages/HomePage";
+import ChatRoutes from "./routes/Chat/ChatRoutes";
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,14 @@ const App: React.FC = () => {
             element={
               <ErrorBoundary>
                 <StudentRoutes />
+              </ErrorBoundary>
+            } 
+          />
+          <Route 
+            path="/chat/*" 
+            element={
+              <ErrorBoundary>
+                <ChatRoutes />
               </ErrorBoundary>
             } 
           />

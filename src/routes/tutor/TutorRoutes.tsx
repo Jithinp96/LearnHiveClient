@@ -13,6 +13,8 @@ import CoursePage from "@/pages/tutor/CoursePage";
 import AddNewCoursePage from "@/pages/tutor/AddNewCoursePage";
 import TutorAppointmentPage from "@/pages/tutor/AppointmentPage";
 import EditCoursePage from "@/pages/tutor/EditCoursePage";
+import TutorAssessmentListPage from "@/pages/assessment/TutorAssessmentListPage";
+import CreateAssessmentPage from "@/pages/assessment/CreateAssessmentPage";
 
 const TutorRoutes: React.FC = () => {
   return (
@@ -32,6 +34,8 @@ const TutorRoutes: React.FC = () => {
         <Route path="/add-course" element={<AddNewCoursePage />} />
         <Route path="/edit-course/:courseId" element={<EditCoursePage />} />
         <Route path="/appointment" element={<TutorAppointmentPage />} />
+        <Route path="/assessment" element={<TutorAssessmentListPage />} />
+        <Route path="/create-assessment" element={<CreateAssessmentPage />} />
       </Route>
     </Routes>
   );

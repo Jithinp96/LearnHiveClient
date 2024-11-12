@@ -1,6 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { getTutorListAPI } from '../../api/adminAPI/adminAPI';
 import { useNavigate } from 'react-router-dom';
+import Table from '../ui/Table';
 
 interface Tutor {
     _id: string;
@@ -11,13 +12,13 @@ interface Tutor {
 }
 
 const TutorList: React.FC = () => {
-  const [tutors, setTutors] = useState<Tutor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+    const [tutors, setTutors] = useState<Tutor[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-  const navigate = useNavigate()
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
         const fetchTutors = async () => {
             try {
                 const response = await getTutorListAPI();
@@ -33,51 +34,54 @@ const TutorList: React.FC = () => {
     }, []);
 
     const handleRowClick = (id: string) => {
-        navigate(`/admin/tutor/${id}`)
+        navigate(`/admin/tutor/${id}`);
+    };
+
+    const columns = [
+        { 
+            header: 'Tutor Name',
+            accessor: 'name' as keyof Tutor
+        },
+        { 
+            header: 'Email',
+            accessor: 'email' as keyof Tutor
+        },
+        { 
+            header: 'Mobile Number',
+            accessor: 'mobile' as keyof Tutor
+        },
+        { 
+            header: 'Status',
+            accessor: 'isBlocked' as keyof Tutor,
+            render: (value: boolean) => (
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    !value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                    {value ? 'Blocked' : 'Active'}
+                </span>
+            )
+        }
+    ];
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-  if (loading) {
-      return <div>Loading...</div>;
-  }
+    if (error) {
+        return <div>{error}</div>;
+    }
 
-  if (error) {
-      return <div>{error}</div>;
-  }
-
-  return (
-      <div className="bg-gray-50 p-4">
-          <h3 className="text-xl font-semibold px-2 pb-4">Tutors List</h3>
-          <table className="w-full bg-white shadow-sm rounded-lg overflow-hidden">
-              <thead className="bg-gray-100">
-                  <tr>
-                      <th className="px-4 py-2 text-left font-semibold text-gray-600">Student Name</th>
-                      <th className="px-4 py-2 text-left font-semibold text-gray-600">Email</th>
-                      <th className="px-4 py-2 text-left font-semibold text-gray-600">Mobile Number</th>
-                      <th className="px-4 py-2 text-left font-semibold text-gray-600">Status</th>
-                  </tr>
-              </thead>
-              <tbody>
-                    {tutors.map((tutor, index) => (
-                        <tr key={index} 
-                            className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                            onClick={() => handleRowClick(tutor._id)}
-                        >
-                          <td className="px-4 py-2">{tutor.name}</td>
-                          <td className="px-4 py-2">{tutor.email}</td>
-                          <td className="px-4 py-2">{tutor.mobile}</td>
-                          <td className="px-4 py-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-semibold 
-                                  ${ 
-                                    tutor.isBlocked === false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }`}>
-                                    {tutor.isBlocked ? 'Blocked' : 'Active'}
-                              </span>
-                          </td>
-                      </tr>
-                  ))}
-              </tbody>
-          </table>
-      </div>
-  );
+    return (
+        <div className="bg-gray-50 p-4">
+            <h3 className="text-xl font-semibold px-2 pb-4">Tutors List</h3>
+            <Table 
+                data={tutors}
+                columns={columns}
+                itemsPerPage={10}
+                onRowClick={(tutor) => handleRowClick(tutor._id)}
+            />
+        </div>
+    );
 };
 
 export default TutorList;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, CalendarClock, MessageCircle } from 'lucide-react'; // Import the chat icon
 import { useParams, Link } from 'react-router-dom';
 import { getTutorDetailsForStudentAPI } from '@/api/studentAPI/studentAPI';
 import { Button } from '@/components/ui/button';
@@ -99,9 +99,19 @@ const TutorProfileView: React.FC = () => {
                         </div>
                     </div>
 
-                    <Link to={`/slotbooking/${tutorId}`} className="block">
-                        <Button className='w-full'>Book My Slot</Button>
-                    </Link>
+                    {/* Chat and Book Slot Buttons */}
+                    <div className="flex gap-2">
+                        <Link to={`/slotbooking/${tutorId}`} className="block w-1/2">
+                            <Button className="w-full flex items-center justify-center">
+                                <CalendarClock className="w-4 h-4 mr-2" /> Book My Slot
+                            </Button>
+                        </Link>
+                        <Link to={`/chat/Tutor/${tutorId}`} className="block w-1/2">
+                            <Button className="w-full flex items-center justify-center">
+                                <MessageCircle className="w-4 h-4 mr-2" /> Chat with Me
+                            </Button>
+                        </Link>
+                    </div>
 
                     {/* Personal Details Section */}
                     <div className="bg-white rounded-lg shadow p-4 sm:p-6">

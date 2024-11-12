@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Copy, Check, Link as LinkIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 import { cancelSlotOrderAPI, getSlotOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import ConfirmActionDialog from '@/components/ui/ConfirmationBox';
 
 interface Slot {
-    subject: string,
-    level: string,
-    date: string,
-    startTime: string,
-    endTime: string,
+    subject: string;
+    level: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    meetingLink?: string | null;
 }
 
 interface Order {
@@ -25,6 +27,17 @@ interface Order {
 const SlotOrderList: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isCanceling, setIsCanceling] = useState<{ [key: string]: boolean }>({});
+    const [copiedLinks, setCopiedLinks] = useState<{ [key: string]: boolean }>({});
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -54,10 +67,36 @@ const SlotOrderList: React.FC = () => {
         }
     };
 
+    const handleCopyLink = async (orderId: string, meetingLink: string) => {
+        try {
+            await navigator.clipboard.writeText(meetingLink);
+            setCopiedLinks(prev => ({ ...prev, [orderId]: true }));
+            toast.success("Meeting link copied to clipboard!");
+
+            setTimeout(() => {
+                setCopiedLinks(prev => ({ ...prev, [orderId]: false }));
+            }, 2000);
+        } catch (error) {
+            toast.error("Failed to copy link");
+        }
+    };
+
     const handleDelete = (id: string) => {
         console.log("Id got: ", id);
-        
         handleCancelOrder(id);
+    };
+
+    const getStatusClasses = (status: string) => {
+        switch (status) {
+            case 'Completed':
+                return 'bg-green-50 text-green-600';
+            case 'Scheduled':
+                return 'bg-blue-50 text-blue-600';
+            case 'Cancelled':
+                return 'bg-red-50 text-red-600';
+            default:
+                return 'bg-gray-50 text-gray-600';
+        }
     };
 
     return (
@@ -98,19 +137,6 @@ const SlotOrderList: React.FC = () => {
                 {orders.map((order) => {
                     const uniqueKey = `${order._id}-${order.slotId.subject}`;
 
-                    const getStatusClasses = () => {
-                        switch (order.sessionStatus) {
-                            case 'Completed':
-                                return 'bg-green-50 text-green-600';
-                            case 'Scheduled':
-                                return 'bg-blue-50 text-blue-600';
-                            case 'Cancelled':
-                                return 'bg-red-50 text-red-600';
-                            default:
-                                return 'bg-gray-50 text-gray-600';
-                        }
-                    };
-
                     return (
                         <div key={uniqueKey} className="grid grid-cols-12 p-4 border-b items-center hover:bg-gray-50">
                             <div className="col-span-3">
@@ -122,33 +148,53 @@ const SlotOrderList: React.FC = () => {
                                 </div>
                             </div>
                             <div className="col-span-3">
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-col gap-2">
                                     <div>
-                                        <p className="font-medium">{order.slotId.date}</p>
+                                        <p className="font-medium">{formatDate(order.slotId.date)}</p>
                                         <p className="text-sm text-gray-500">{order.slotId.startTime} - {order.slotId.endTime}</p>
                                     </div>
+                                    {order.slotId.meetingLink && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-1 h-7 w-fit"
+                                            onClick={() => handleCopyLink(order._id, order.slotId.meetingLink!)}
+                                        >
+                                            {copiedLinks[order._id] ? (
+                                                <>
+                                                    <Check size={14} className="text-green-600" />
+                                                    <span className="text-sm">Copied!</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <LinkIcon size={14} />
+                                                    <span className="text-sm">Copy Meeting Link</span>
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
-                            <div className="col-span-2 text-gray-500">{order.createdAt}</div>
+                            <div className="col-span-2 text-gray-500">{formatDate(order.createdAt)}</div>
                             <div className="col-span-2 font-medium">₹{order.amount}</div>
                             <div className="col-span-1 flex items-center justify-between">
-                                <span className={`px-3 py-1 rounded-full text-sm ${getStatusClasses()}`}>
+                                <span className={`px-3 py-1 rounded-full text-sm ${getStatusClasses(order.sessionStatus)}`}>
                                     {order.sessionStatus}
                                 </span>
                             </div>
                             <div className="col-span-1">
-                            <ConfirmActionDialog
-                                title="Cancel Slot Order"
-                                triggerElement={{
-                                    type: 'button',
-                                    content: 'Cancel',
-                                }}
-                                description="Are you sure you want to cancel this slot? This action cannot be undone."
-                                confirmText="Confirm Cancel"
-                                cancelText="Close"
-                                onConfirm={() => handleDelete(order._id)}
-                                variant="destructive"
-                            />
+                                <ConfirmActionDialog
+                                    title="Cancel Slot Order"
+                                    triggerElement={{
+                                        type: 'button',
+                                        content: 'Cancel',
+                                    }}
+                                    description="Are you sure you want to cancel this slot? This action cannot be undone."
+                                    confirmText="Confirm Cancel"
+                                    cancelText="Close"
+                                    onConfirm={() => handleDelete(order._id)}
+                                    variant="destructive"
+                                />
                             </div>
                         </div>
                     );

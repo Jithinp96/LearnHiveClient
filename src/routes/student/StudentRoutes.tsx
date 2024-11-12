@@ -23,6 +23,11 @@ import PurchasedCourseListPage from "@/pages/student/PurchasedCourseListPage";
 import VideoCallRoomPage from "@/pages/communication/VideoCallRoomPage";
 import VideoCallEntryPage from "@/pages/communication/VideoCallEntryPage";
 import SlotOrderListPage from "@/pages/student/SlotOrderListPage";
+import StudentAssessmentListPage from "@/pages/assessment/StudentAssessmentListPage";
+import AssessmentGuidelinesPage from "@/pages/assessment/AssessmentGuidelinesPage";
+import AssessmentInterfacePage from "@/pages/assessment/AssessmentInterfacePage";
+import SubmissionSuccessPage from "@/pages/assessment/SubmissionSuccessPage";
+import AssessmentResultPage from "@/pages/assessment/AssessmentResultPage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -48,13 +53,17 @@ const StudentRoutes: React.FC = () => {
         <Route path="/slot-orders" element={<SlotOrderListPage />} />
         <Route path="/mycourses" element={<PurchasedCourseListPage />} />
         <Route path="/course-view/:id" element={<CourseViewerPage />} />
-        
+        <Route path="/assessment-list" element={<StudentAssessmentListPage />} />
+        <Route path="/assessment-guidelines/:assessmentId" element={<AssessmentGuidelinesPage />} />
+        <Route path="/start-assessment/:assessmentId" element={ <AssessmentInterfacePage /> } />
+        <Route path='/assessment-complete' element={<SubmissionSuccessPage />} />
+        <Route path="/assessment-result/:assessmentId" element={<AssessmentResultPage />} />
       </Route>
       
       <Route path="/allcourses" element={<AllCourseListPage />} />
       <Route path="/course/:id" element={<CourseDetailPage />} />
       <Route path="/room" element={<VideoCallEntryPage />} />
-        <Route path="/room/:id" element={<VideoCallRoomPage />} />
+      <Route path="/room/:id" element={<VideoCallRoomPage />} />
     </Routes>
   );
 };

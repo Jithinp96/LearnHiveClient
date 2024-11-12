@@ -1,6 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { getStudentsListAPI } from '../../api/adminAPI/adminAPI';
 import { useNavigate } from 'react-router-dom';
+import Table from '../ui/Table';
 
 interface Student {
     _id: string;
@@ -15,26 +16,52 @@ const AdminStudentsList: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     useEffect(() => {
-            const fetchStudents = async () => {
-                try {
-                    const response = await getStudentsListAPI();
-                    setStudents(response.data);
-                    setLoading(false);
-                } catch (error) {
-                    setError('Failed to load students');
-                    setLoading(false);
-                }
-            };
+        const fetchStudents = async () => {
+            try {
+                const response = await getStudentsListAPI();
+                setStudents(response.data);
+                setLoading(false);
+            } catch (error) {
+                setError('Failed to load students');
+                setLoading(false);
+            }
+        };
 
-            fetchStudents();
-        }, []);
+        fetchStudents();
+    }, []);
 
-        const handleRowClick = (id: string) => {
-            navigate(`/admin/student/${id}`)
+    const handleRowClick = (id: string) => {
+        navigate(`/admin/student/${id}`);
+    };
+
+    const columns = [
+        { 
+            header: 'Student Name',
+            accessor: 'name' as keyof Student
+        },
+        { 
+            header: 'Email',
+            accessor: 'email' as keyof Student
+        },
+        { 
+            header: 'Mobile Number',
+            accessor: 'mobile' as keyof Student
+        },
+        { 
+            header: 'Status',
+            accessor: 'isBlocked' as keyof Student,
+            render: (value: boolean) => (
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    !value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                    {value ? 'Blocked' : 'Active'}
+                </span>
+            )
         }
+    ];
 
     if (loading) {
         return <div>Loading...</div>;
@@ -47,35 +74,12 @@ const AdminStudentsList: React.FC = () => {
     return (
         <div className="bg-gray-50 p-4">
             <h3 className="text-xl font-semibold px-2 pb-4">Students List</h3>
-            <table className="w-full bg-white shadow-sm rounded-lg overflow-hidden">
-                <thead className="bg-gray-100">
-                    <tr>
-                        <th className="px-4 py-2 text-left font-semibold text-gray-600">Student Name</th>
-                        <th className="px-4 py-2 text-left font-semibold text-gray-600">Email</th>
-                        <th className="px-4 py-2 text-left font-semibold text-gray-600">Mobile Number</th>
-                        <th className="px-4 py-2 text-left font-semibold text-gray-600">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        {students.map((student, index) => (
-                            <tr key={index} 
-                                className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                                onClick={() => handleRowClick(student._id)}
-                            >
-                            <td className="px-4 py-2">{student.name}</td>
-                            <td className="px-4 py-2">{student.email}</td>
-                            <td className="px-4 py-2">{student.mobile}</td>
-                            <td className="px-4 py-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-semibold 
-                                    ${ 
-                                        student.isBlocked === false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }`}>
-                                        {student.isBlocked ? 'Blocked' : 'Active'}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <Table 
+                data={students}
+                columns={columns}
+                itemsPerPage={10}
+                onRowClick={(student) => handleRowClick(student._id)}
+            />
         </div>
     );
 };

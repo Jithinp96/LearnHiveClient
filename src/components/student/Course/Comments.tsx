@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ThumbsUp } from 'lucide-react';
+// import { ThumbsUp } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -71,10 +71,10 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
       }
     };
   
-    const startEditingComment = (comment: Comment) => {
-      setEditingComment(comment);
-      setNewComment(comment.content);
-    };
+    // const startEditingComment = (comment: Comment) => {
+    //   setEditingComment(comment);
+    //   setNewComment(comment.content);
+    // };
   
     return (
       <div className="space-y-6">
@@ -129,22 +129,22 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className="flex items-center gap-2"
                   >
                     <ThumbsUp className="w-4 h-4" />
                     <span>{comment.likes}</span>
-                  </Button>
+                  </Button> */}
                   {/* Add edit and delete buttons */}
-                  <Button 
+                  {/* <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => startEditingComment(comment)}
                   >
                     Edit
-                  </Button>
+                  </Button> */}
                   <Button 
                     variant="ghost" 
                     size="sm" 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, ThumbsUp } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,11 +75,11 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     }
   };
 
-  const startEditingReview = (review: Review) => {
-    setEditingReview(review);
-    setNewReview(review.comment);
-    setRating(review.rating);
-  };
+  // const startEditingReview = (review: Review) => {
+  //   setEditingReview(review);
+  //   setNewReview(review.comment);
+  //   setRating(review.rating);
+  // };
 
   return (
     <div className="space-y-6">
@@ -162,22 +162,22 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   className="flex items-center gap-2"
                 >
                   <ThumbsUp className="w-4 h-4" />
                   <span>{review.helpful}</span>
-                </Button>
+                </Button> */}
                 {/* Add edit and delete buttons */}
-                <Button 
+                {/* <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => startEditingReview(review)}
                 >
                   Edit
-                </Button>
+                </Button> */}
                 <Button 
                   variant="ghost" 
                   size="sm" 

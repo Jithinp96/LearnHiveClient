@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, CalendarPlus, Clock, GraduationCap, IndianRupee } from 'lucide-react';
+import { Calendar, CalendarPlus, Check, Clock, Copy, GraduationCap, IndianRupee, Link } from 'lucide-react';
 
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ interface TutorSlot {
     endTime: string;
     price: number;
     isBooked: boolean;
+    meetingLink: string | null;
 }
 
 interface Subject {
@@ -38,6 +39,7 @@ const TutorAppointmentDetails: React.FC = () => {
   const [editingSlot, setEditingSlot] = useState<TutorSlot | null>(null);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [selectedSlot, setSelectedSlot] = useState<TutorSlot | null>(null);
+  const [copiedLinks, setCopiedLinks] = useState<{[key: string]: boolean}>({});
 
   const [subject, setSubject] = useState<string>("");
   const [level, setLevel] = useState<string>("");
@@ -186,6 +188,21 @@ const TutorAppointmentDetails: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving slot:', error);
+    }
+  };
+
+  const handleCopyLink = async (id: string, link: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedLinks(prev => ({ ...prev, [id]: true }));
+      toast.success('Meeting link copied to clipboard!');
+      
+      // Reset the copied status after 2 seconds
+      setTimeout(() => {
+        setCopiedLinks(prev => ({ ...prev, [id]: false }));
+      }, 2000);
+    } catch (err) {
+      toast.error('Failed to copy link');
     }
   };
 
@@ -350,7 +367,7 @@ const TutorAppointmentDetails: React.FC = () => {
         setRequiresDailySlotCreation={setRequiresDailySlotCreation}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {slots.map((slot: TutorSlot) => (
           <Card
             key={slot._id}
@@ -389,6 +406,26 @@ const TutorAppointmentDetails: React.FC = () => {
                 <IndianRupee size={18} />
                 <span>{slot.price}</span>
               </div>
+              {slot.meetingLink && (
+                <div className="flex items-center justify-between gap-2 p-2 bg-blue-50 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-600 flex-1 overflow-hidden">
+                    <Link size={18} />
+                    <span className="truncate text-sm">{slot.meetingLink}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hover:bg-blue-100"
+                    onClick={() => handleCopyLink(slot._id, slot.meetingLink!)}
+                  >
+                    {copiedLinks[slot._id] ? (
+                      <Check size={16} className="text-green-600" />
+                    ) : (
+                      <Copy size={16} className="text-blue-600" />
+                    )}
+                  </Button>
+                </div>
+              )}
               <Button
                 className={`w-full ${
                   slot.isBooked
