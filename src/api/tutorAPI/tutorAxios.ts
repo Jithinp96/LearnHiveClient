@@ -59,6 +59,16 @@ export const tutorResetPasswordAPI = async (newPassword: string, token: string |
     }
 };
 
+export const getTutorDashboardAPI = async() => {
+    try {
+        const response = await axiosInstance.get('/tutor/dashboard');
+        console.log("response of getDashboard: ", response);
+        return response
+    } catch (error) {
+        console.error("Error in fetching tutor dashboard from api file:", error);
+    }
+}
+
 // Get tutor details
 export const getTutorDetailsAPI = async (id: string) => {
     try {

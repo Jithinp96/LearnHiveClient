@@ -6,7 +6,7 @@ import ChatUIPage from "@/pages/chat/ChatUIPage";
 const ChatRoutes: React.FC = () => {
     return (
         <Routes>
-            <Route path="/:receiverRole/:receiverId" element={ <ChatUIPage /> }/>
+            <Route path="/" element={ <ChatUIPage /> }/>
         </Routes>
     );
 };

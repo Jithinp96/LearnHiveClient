@@ -70,8 +70,8 @@ const TutorNavbar : React.FC = () => {
           <a href="/tutor/assessment" className="block text-white px-4 py-2 md:inline">
             Assessments
           </a>
-          <a href="#" className="block text-white px-4 py-2 md:inline">
-            Contact
+          <a href="/chat" className="block text-white px-4 py-2 md:inline">
+            Messages
           </a>
         </div>
 

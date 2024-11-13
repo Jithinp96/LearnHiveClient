@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { logoutStudent } from '../../../redux/slices/studentSlice';
 import { logoutStudentAPI } from '../../../api/studentAPI/studentAPI';
-import { ShoppingCart, Library, Home, BookOpen, Phone, Video, BookCheck } from 'lucide-react';
+import { ShoppingCart, Library, Home, BookOpen, Video, BookCheck, MessageCircle } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,9 +69,9 @@ const Navbar: React.FC = () => {
             <Video className="h-5 w-5" />
             <span>Video Call</span>
           </a>
-          <a href="#" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
-            <Phone className="h-5 w-5" />
-            <span>Contact</span>
+          <a href="/chat" className="flex items-center text-white px-4 py-2 hover:text-gray-300 transition-colors space-x-2">
+            <MessageCircle className="h-5 w-5" />
+            <span>Messages</span>
           </a>
           {isStudentAuthenticated && studentInfo && (
             <>
