@@ -34,7 +34,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   useEffect(()=>{
     socket.on('receiveMessage',(data)=>{
-        setMessages((prev)=>[...prev,data])
+        console.log("data from socket.on receive: ", data);
+      
+        const standardizedData = {
+          ...data,
+          message: data.message || data.text,
+      };
+
+      setMessages((prev) => [...prev, standardizedData]);
     })
   },[])
 
@@ -81,7 +88,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             <div className={`max-w-[70%] ${message.senderId === currentUserId ? 'order-2' : 'order-1'}`}>
               <div
                 className={`rounded-lg p-3 ${
-                  message.senderId === currentUserId ? 'bg-blue-500 text-white' : 'bg-white'
+                  message.senderId === currentUserId ? 'bg-blue-500 text-white' : 'bg-gray-200'
                 }`}
               >
                 <p>{message.message}</p>
@@ -93,7 +100,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 )}
               </div>
               <p className="text-xs text-gray-400 mt-1 text-right">
-                {formatDate(message.time)} - {message.status}
+                {formatDate(message.time)}
               </p>
             </div>
           </div>

@@ -81,7 +81,7 @@ const StudentDashboard : React.FC = () => {
                         </div>
                         <div className="space-y-4">
                             {courses.map((course) => (
-                            <CourseCard key={course.name} {...course} />
+                                <CourseCard key={course.name} {...course} />
                             ))}
                         </div>
                     </div>

@@ -28,6 +28,14 @@ export const logoutAdminAPI = async (role: string) => {
         { withCredentials: true });
 }
 
+export const getDashboardAPI = async () => {
+    try {
+        return await axiosInstance.get('/admin/dashboard')
+    } catch (error) {
+        console.error('Error fetching admin dashboard in API: ', error);
+    }
+}
+
 export const getStudentsListAPI = async () => {
     try {
         return await axios.get(`${import.meta.env.VITE_API_URL}/admin/students`, 

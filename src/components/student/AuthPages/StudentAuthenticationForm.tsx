@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 
 import { studentLoginSuccess } from "../../../redux/slices/studentSlice";
 import { loginStudentAPI, registerStudentAPI } from "../../../api/studentAPI/studentAPI";
@@ -34,20 +35,29 @@ const AuthenticationForm: React.FC = () => {
     }
   };
 
-  const handleSignIn = async(email: string, password: string) => {
+  const handleSignIn = async (email: string, password: string) => {
     setLoading(true);
     setErrorMessage(null);
-
-    const response = await loginStudentAPI(email, password);
-    setLoading(false);
-    
-    if(response && response.status === 200) {
-      dispatch(studentLoginSuccess(response.data.student));
-      navigate("/dashboard");
-    } else {
-      console.error("Invalid credentials or server error");
+  
+    try {
+      const response = await loginStudentAPI(email, password);
+      setLoading(false);
+      if (response && response.status === 200) {
+        dispatch(studentLoginSuccess(response.data.student));
+        navigate("/dashboard");
+      } else {
+        setErrorMessage("Invalid credentials or server error. Please try again!");
+      }
+    } catch (error) {
+      setLoading(false);
+      if (axios.isAxiosError(error) && error.response) {
+        setErrorMessage(error.response.data?.message || "An error occurred. Please try again!");
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again!");
+      }
     }
   };
+  
 
   return (
     <div className="bg-[#f6f5f7] flex justify-center items-center flex-col font-['Montserrat',sans-serif] min-h-screen py-5 px-4">

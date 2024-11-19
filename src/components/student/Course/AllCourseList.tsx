@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fetchAllCoursesAPI, fetchCategoriesAPI, getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
 import { RootState } from '@/redux/store';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface Category {
     _id: string;
@@ -30,51 +31,57 @@ const levels = ['Beginner', 'Intermediate', 'Expert'];
 
 const AllCourseList: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
-    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [purchasedCourses, setPurchasedCourses] = useState<string[]>([]);
-
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    
     const navigate = useNavigate();
-
     const { studentInfo } = useSelector((state: RootState) => state.student);
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchCategories = async () => {
             try {
-                const [coursesResponse, categoriesResponse] = await Promise.all([
-                    fetchAllCoursesAPI(),
-                    fetchCategoriesAPI()
-                ]);
-                setCourses(coursesResponse?.data);
-                setFilteredCourses(coursesResponse?.data);
+                const categoriesResponse = await fetchCategoriesAPI();
                 setCategories(categoriesResponse?.data);
-
-                if (studentInfo?._id) {
-                    const purchasedResponse = await getCourseOrderDetailsAPI();
-                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId._id));
-                }
-
             } catch (error) {
-                toast.error("Error loading course list. Please try again!")
+                toast.error("Error loading categories!");
             }
         };
 
-        fetchData();
+        fetchCategories();
     }, []);
 
     useEffect(() => {
-        const filtered = courses.filter(course => {
-            const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(course.category._id);
-            const matchesLevel = selectedLevels.length === 0 || selectedLevels.includes(course.level);
-            return matchesSearch && matchesCategory && matchesLevel;
-        });
-        setFilteredCourses(filtered);
-    }, [searchTerm, selectedCategories, selectedLevels, courses]);
+        const fetchCourses = async () => {
+            setIsLoading(true);
+            try {
+                const [coursesResponse, purchasedResponse] = await Promise.all([
+                    fetchAllCoursesAPI({
+                        search: debouncedSearch,
+                        categories: selectedCategories,
+                        levels: selectedLevels
+                    }),
+                    studentInfo?._id ? getCourseOrderDetailsAPI() : Promise.resolve([])
+                ]);
+
+                setCourses(coursesResponse?.data);
+                if (studentInfo?._id) {
+                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId._id));
+                }
+            } catch (error) {
+                toast.error("Error loading course list. Please try again!");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, [debouncedSearch, selectedCategories, selectedLevels, studentInfo?._id]);
 
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -170,37 +177,49 @@ const AllCourseList: React.FC = () => {
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredCourses.map((course) => (
-                            <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
-                                <img src={course.thumbnailUrl} alt={course.title} className="w-full h-48 object-cover" />
-                                <div className="p-4 flex-grow">
-                                    <span className="text-xs font-semibold text-gray-500">{course.category.name}</span>
-                                    <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-                                    <div className="flex items-center text-sm text-gray-600 mb-2">
-                                        <span className="mr-4">{course.level}</span>
-                                        <Clock size={16} className="mr-1" />
-                                        <span>{course.duration} Hours</span>
+                    {isLoading ? (
+                        <div className="flex justify-center items-center min-h-[200px]">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {courses.map((course) => (
+                                <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
+                                    <img src={course.thumbnailUrl} alt={course.title} className="w-full h-48 object-cover" />
+                                    <div className="p-4 flex-grow">
+                                        <span className="text-xs font-semibold text-gray-500">{course.category.name}</span>
+                                        <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
+                                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                                            <span className="mr-4">{course.level}</span>
+                                            <Clock size={16} className="mr-1" />
+                                            <span>{course.duration} Hours</span>
+                                        </div>
+                                        <div className="flex items-center text-sm">
+                                            <Star size={16} className="text-yellow-500 mr-1" />
+                                            <span>{course.rating || 'No rating yet'} ({course.reviews.length} reviews)</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center text-sm">
-                                        <Star size={16} className="text-yellow-500 mr-1" />
-                                        <span>{course.rating || 'No rating yet'} ({course.reviews.length} reviews)</span>
+                                    <div className="p-4 flex justify-between items-center bg-gray-100">
+                                        <span className="font-bold text-xl">
+                                            ₹{course.price.toFixed(2)}
+                                        </span>
+                                        <Button
+                                            className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                            onClick={() => handleViewCourse(course._id)}
+                                        >
+                                            {purchasedCourses.includes(course._id) ? 'Go to Course' : 'View Course'}
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="p-4 flex justify-between items-center bg-gray-100">
-                                    <span className="font-bold text-xl">
-                                        ₹{course.price.toFixed(2)}
-                                    </span>
-                                    <Button
-                                        className="bg-yellow-500 text-white px-4 py-2 rounded"
-                                        onClick={() => handleViewCourse(course._id)}
-                                    >
-                                        {purchasedCourses.includes(course._id) ? 'Go to Course' : 'View Course'}
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {!isLoading && courses.length === 0 && (
+                        <div className="text-center py-8">
+                            <p className="text-gray-500">No courses found matching your criteria.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

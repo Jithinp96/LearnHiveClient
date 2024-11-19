@@ -53,23 +53,20 @@ const ForgotPassword: React.FC = () => {
                         <p className="text-center mb-8">Enter your email to receive a password reset link.</p>
                         
                         <form onSubmit={handleSubmit} className="w-full">
-                            <FloatingLabelInput
-                                label="Email"
+                            <input
                                 type="email"
-                                id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email"
+                                className="w-full px-4 py-2 mb-4 text-lg border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                                 required
-                                disabled={isSubmitting}
                             />
-                            
-                            <AuthPageButton 
-                                variant='primary'
+                            <button 
                                 type="submit"
-                                disabled={isSubmitting}
+                                className="w-full bg-[#FF4B2B] text-white rounded-[20px] border-0 py-3 px-[45px] text-xs font-bold uppercase tracking-[1px] transition-all duration-80 ease-in hover:bg-[#FF416C] active:scale-95 focus:outline-none"
                             >
-                                {isSubmitting ? 'Sending...' : 'Reset Password'}
-                            </AuthPageButton>
+                                Reset Password
+                            </button>
                         </form>
 
                         {!isError && message && (

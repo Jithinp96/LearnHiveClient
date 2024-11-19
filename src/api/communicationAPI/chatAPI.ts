@@ -26,7 +26,7 @@ export const getUserMessageAPI = async(receiverId: string) => {
             params: { receiverId }
         });
 
-        console.log("conversations from chatAPI: ", conversations);
+        // console.log("conversations from chatAPI: ", conversations);
         return conversations.data;
     } catch (error) {
         console.error("Error fetching messages:", error);
@@ -37,7 +37,7 @@ export const getUserMessageAPI = async(receiverId: string) => {
 export const sendMessageAPI = async (newMessage: object) => {
     try {
       const response = await axiosInstance.post(`/chat/send`, newMessage);
-        console.log("response: ", response);
+        // console.log("response: ", response);
         return response.data;
     } catch (error) {
       console.error("Error in sending message:", error);

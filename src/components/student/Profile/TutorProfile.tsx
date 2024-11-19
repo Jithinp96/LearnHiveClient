@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, CalendarClock, MessageCircle } from 'lucide-react'; // Import the chat icon
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getTutorDetailsForStudentAPI } from '@/api/studentAPI/studentAPI';
+import { getUserConversationAPI, sendMessageAPI } from '@/api/communicationAPI/chatAPI';
 import { Button } from '@/components/ui/button';
 
 interface TutorSubject {
@@ -39,6 +40,7 @@ const TutorProfileView: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const { tutorId } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTutorDetails = async () => {
@@ -57,6 +59,39 @@ const TutorProfileView: React.FC = () => {
 
         fetchTutorDetails();
     }, [tutorId]);
+
+    const handleChatClick = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!tutorDetails || !tutorId) return;
+
+        try {
+            // First, check if a conversation exists
+            const conversationsResponse = await getUserConversationAPI();
+            const existingConversation = conversationsResponse?.data.conversations.find(
+                (conv: any) => conv._id === tutorId
+            );
+
+            if (existingConversation) {
+                // If conversation exists, navigate to chat
+                navigate('/chat');
+            } else {
+                // If no conversation exists, create one with initial message
+                const initialMessage = {
+                    senderId: '', // Will be set by backend from token
+                    senderRole: 'Student',
+                    receiverId: tutorId,
+                    receiverRole: 'Tutor',
+                    text: 'Hi'
+                };
+
+                await sendMessageAPI(initialMessage);
+                navigate('/chat');
+            }
+        } catch (error) {
+            console.error('Error handling chat:', error);
+            // You might want to show an error message to the user
+        }
+    };
 
     if (loading) {
         return (
@@ -106,11 +141,12 @@ const TutorProfileView: React.FC = () => {
                                 <CalendarClock className="w-4 h-4 mr-2" /> Book My Slot
                             </Button>
                         </Link>
-                        <Link to={`/chat/Tutor/${tutorId}`} className="block w-1/2">
-                            <Button className="w-full flex items-center justify-center">
-                                <MessageCircle className="w-4 h-4 mr-2" /> Chat with Me
-                            </Button>
-                        </Link>
+                        <Button 
+                            onClick={handleChatClick}
+                            className="w-1/2 flex items-center justify-center"
+                        >
+                            <MessageCircle className="w-4 h-4 mr-2" /> Chat with Me
+                        </Button>
                     </div>
 
                     {/* Personal Details Section */}

@@ -73,14 +73,14 @@ const TutorAssessmentList:React.FC = () => {
                 </h2>
                 <p className="text-gray-600">{assessment.description}</p>
               </div>
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 <button className="text-blue-600 hover:text-blue-700">
                   Edit
                 </button>
                 <button className="text-gray-600 hover:text-gray-700">
                   Delete
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-6 grid grid-cols-4 gap-4">
@@ -117,7 +117,7 @@ const TutorAssessmentList:React.FC = () => {
                 )}
               </div>
               
-              <div className="flex gap-3">
+              {/* <div className="flex gap-3">
                 <button className="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
                   View Responses
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -126,7 +126,7 @@ const TutorAssessmentList:React.FC = () => {
                   View Details
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         ))}

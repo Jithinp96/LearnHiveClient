@@ -23,20 +23,30 @@ export const registerStudentAPI=async (name: string, email: string, mobile: numb
 
 export const loginStudentAPI = async (email: string, password: string) => {
     try {
-        return await axios.post(
-            `${import.meta.env.VITE_API_URL}/students/login`,
-            {
-                email, 
-                password
-            },
-            {
-                withCredentials: true
-            }
-        )
+        // return await axios.post(
+        //     `${import.meta.env.VITE_API_URL}/students/login`,
+        //     {
+        //         email, 
+        //         password
+        //     },
+        //     {
+        //         withCredentials: true
+        //     }
+        // )
+        return await axiosInstance.post('/students/login', {email, password})
     } catch (error) {
-        console.error("Error logging in:", error);
+        throw error
     }
 }
+
+export const googleLoginStudentAPI = async (credentials: string) => {
+    try {
+      return await axiosInstance.post('/students/google-login', { credentials });
+    } catch (error) {
+      console.error('API error:', error);
+      throw error;
+    }
+  };
 
 export const logoutStudentAPI = async (role: string) => {
     return await axios.post(
@@ -110,15 +120,35 @@ export const fetchCategoriesAPI = async() => {
     }
 }
 
-export const fetchAllCoursesAPI = async() => {
+// export const fetchAllCoursesAPI = async() => {
+//     try {
+//         return await axiosInstance.get('/students/allcourses', 
+//             {
+//                 withCredentials: true,
+//             }
+//         )
+//     } catch (error) {
+//         console.error("Error in fetching courses:", error);
+//     }
+// }
+
+export const fetchAllCoursesAPI = async (params: {
+    search?: string;
+    categories?: string[];
+    levels?: string[];
+}) => {
     try {
-        return await axiosInstance.get('/students/allcourses', 
-            {
-                withCredentials: true,
-            }
-        )
+        const queryParams = new URLSearchParams();
+        if (params.search) queryParams.append('search', params.search);
+        if (params.categories?.length) queryParams.append('categories', params.categories.join(','));
+        if (params.levels?.length) queryParams.append('levels', params.levels.join(','));
+
+        return await axiosInstance.get(`/students/allcourses?${queryParams.toString()}`, {
+            withCredentials: true,
+        });
     } catch (error) {
         console.error("Error in fetching courses:", error);
+        throw error;
     }
 }
 
