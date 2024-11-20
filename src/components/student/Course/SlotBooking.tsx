@@ -85,7 +85,7 @@ const SlotBooking: React.FC<SlotBookingProps> = () => {
       const stripe = await loadStripe(stripe_key);
       const session = await createPaymentIntentAPI(selectedSlot);
 
-      const result = stripe?.redirectToCheckout({
+      stripe?.redirectToCheckout({
         sessionId: session.id,
       });
       

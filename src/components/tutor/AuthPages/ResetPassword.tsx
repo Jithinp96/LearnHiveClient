@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import { tutorResetPasswordAPI } from '../../../api/tutorAPI/tutorAxios';
 
 const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {

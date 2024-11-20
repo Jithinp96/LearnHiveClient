@@ -11,13 +11,9 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  ShieldCheck,
-  Ban,
-  ShieldX
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui//Alert"
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui//Alert";
 import ConfirmActionDialog from '../ui/ConfirmationBox';
 import { approveCourseAPI, getCourseDetails, toggleBlockCourseAPI } from '@/api/adminAPI/adminAPI';
 import toast from 'react-hot-toast';
@@ -80,7 +76,7 @@ interface Course {
   updatedAt: string;
 }
 
-const AdminCourseDetails = () => {
+const AdminCourseDetails: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

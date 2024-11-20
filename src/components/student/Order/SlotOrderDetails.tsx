@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { MessageSquare, Copy, Check, Link as LinkIcon } from 'lucide-react';
+import { MessageSquare, Check, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { cancelSlotOrderAPI, getSlotOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
@@ -43,7 +43,6 @@ const SlotOrderList: React.FC = () => {
         const fetchOrders = async () => {
             try {
                 const response = await getSlotOrderDetailsAPI();
-                console.log("response: ", response);
                 setOrders(response);
             } catch (error) {
                 toast.error("Failed to fetch slot orders. Please try again!");
@@ -183,18 +182,19 @@ const SlotOrderList: React.FC = () => {
                                 </span>
                             </div>
                             <div className="col-span-1">
-                                <ConfirmActionDialog
-                                    title="Cancel Slot Order"
-                                    triggerElement={{
-                                        type: 'button',
-                                        content: 'Cancel',
-                                    }}
-                                    description="Are you sure you want to cancel this slot? This action cannot be undone."
-                                    confirmText="Confirm Cancel"
-                                    cancelText="Close"
-                                    onConfirm={() => handleDelete(order._id)}
-                                    variant="destructive"
-                                />
+                            <ConfirmActionDialog
+                                title="Cancel Slot Order"
+                                triggerElement={{
+                                    type: 'button',
+                                    content: isCanceling[order._id] ? 'Cancelling...' : 'Cancel',
+                                }}
+                                isDisabled={isCanceling[order._id]} // New prop to indicate if the action is disabled
+                                description="Are you sure you want to cancel this slot? This action cannot be undone."
+                                confirmText="Confirm Cancel"
+                                cancelText="Close"
+                                onConfirm={() => handleDelete(order._id)}
+                                variant="destructive"
+                            />
                             </div>
                         </div>
                     );

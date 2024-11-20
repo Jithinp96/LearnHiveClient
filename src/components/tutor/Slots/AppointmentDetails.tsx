@@ -38,7 +38,7 @@ const TutorAppointmentDetails: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editingSlot, setEditingSlot] = useState<TutorSlot | null>(null);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
-  const [selectedSlot, setSelectedSlot] = useState<TutorSlot | null>(null);
+  // const [selectedSlot, setSelectedSlot] = useState<TutorSlot | null>(null);
   const [copiedLinks, setCopiedLinks] = useState<{[key: string]: boolean}>({});
 
   const [subject, setSubject] = useState<string>("");
@@ -196,8 +196,7 @@ const TutorAppointmentDetails: React.FC = () => {
       await navigator.clipboard.writeText(link);
       setCopiedLinks(prev => ({ ...prev, [id]: true }));
       toast.success('Meeting link copied to clipboard!');
-      
-      // Reset the copied status after 2 seconds
+
       setTimeout(() => {
         setCopiedLinks(prev => ({ ...prev, [id]: false }));
       }, 2000);
@@ -226,13 +225,13 @@ const TutorAppointmentDetails: React.FC = () => {
   const handleAddClick = () => {
     setIsEditMode(false);
     resetForm();
-    setSelectedSlot(null);
+    // setSelectedSlot(null);
     setIsModalOpen(true);
   };
 
   const handleEditClick = (slot: TutorSlot) => {
     handleOpenEdit(slot);
-    setSelectedSlot(slot);
+    // setSelectedSlot(slot);
   };
 
   const handleAutoGenSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -314,7 +313,7 @@ const TutorAppointmentDetails: React.FC = () => {
         setIsModalOpen(open);
         if (!open) {
           resetForm();
-          setSelectedSlot(null);
+          // setSelectedSlot(null);
         }
       }}>
         <AddEditModal

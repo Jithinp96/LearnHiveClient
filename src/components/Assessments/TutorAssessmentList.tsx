@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, Book, CheckCircle, ArrowRight, Plus, Calendar } from 'lucide-react';
+import { Clock, Book, CheckCircle, Plus, Calendar } from 'lucide-react';
 import { fetchAssessmentByTutorAPI } from '@/api/assessmentAPI/assessmentAPI';
 
 interface Assessment {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Users, TrendingUp, SquareUserRound, BookOpen, Trophy, IndianRupee, BookOpenCheck, Group } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDashboardAPI } from '@/api/adminAPI/adminAPI';
 

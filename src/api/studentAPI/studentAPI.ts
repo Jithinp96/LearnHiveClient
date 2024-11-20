@@ -3,21 +3,21 @@ import axiosInstance from "../axiosInstance";
 
 export const registerStudentAPI=async (name: string, email: string, mobile: number, password: string )=>{
     try{
-        return await axios.post(
-            `${import.meta.env.VITE_API_URL}/students/auth`,
-            {
-                name,
-                email, 
-                mobile,
-                password
-            },
-            {
-                withCredentials: true
-            }
-        );
-         
-    }catch(err){
-        console.log(err)
+        // return await axios.post(
+        //     `${import.meta.env.VITE_API_URL}/students/auth`,
+        //     {
+        //         name,
+        //         email, 
+        //         mobile,
+        //         password
+        //     },
+        //     {
+        //         withCredentials: true
+        //     }
+        // );
+        return await axiosInstance.post('/students/auth', { name, email, mobile, password})
+    }catch(error){
+        throw error
     }
 }
 
@@ -43,7 +43,6 @@ export const googleLoginStudentAPI = async (credentials: string) => {
     try {
       return await axiosInstance.post('/students/google-login', { credentials });
     } catch (error) {
-      console.error('API error:', error);
       throw error;
     }
   };
@@ -119,18 +118,6 @@ export const fetchCategoriesAPI = async() => {
         throw error;
     }
 }
-
-// export const fetchAllCoursesAPI = async() => {
-//     try {
-//         return await axiosInstance.get('/students/allcourses', 
-//             {
-//                 withCredentials: true,
-//             }
-//         )
-//     } catch (error) {
-//         console.error("Error in fetching courses:", error);
-//     }
-// }
 
 export const fetchAllCoursesAPI = async (params: {
     search?: string;
@@ -213,35 +200,6 @@ export const updateStudentMobileAPI = async (id: string, newNumber: number) => {
         )
     } catch (error) {
         console.error("Error in updating name:", error);
-    }
-}
-
-export const addToCartAPI = async (userId: string, courseId: string) => {
-    try {        
-        return await axiosInstance.post('/students/add-to-cart',
-            {
-                userId,
-                courseId
-            }
-        )
-    } catch (error) {
-        console.error("Error in adding course to cart: ", error);
-    }
-}
-
-export const deleteFromCartAPI = async(id: string) => {
-    try {
-        return await axiosInstance.delete(`/students/cart/delete/${id}`)
-    } catch (error) {
-        console.error("Error in deleting from cart: ", error);
-    }
-}
-
-export const fetchCartAPI = async () => {
-    try {
-        return await axiosInstance.get('/students/cart')
-    } catch (error) {
-        console.error("Error in loading cart: ", error);
     }
 }
 

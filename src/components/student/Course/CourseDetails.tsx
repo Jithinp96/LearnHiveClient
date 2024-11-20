@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Star, User, Clock, Video, ChevronUp, ChevronDown, ChartBarStacked, CircleCheckBig } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { loadStripe } from '@stripe/stripe-js';
 
 import CourseEnrollmentModal from './CourseEnrollmentModal';
-import { addToCartAPI, createCoursePaymentIntentAPI } from '@/api/studentAPI/studentAPI';
+import { createCoursePaymentIntentAPI } from '@/api/studentAPI/studentAPI';
 import { fetchCoursesDetailsAPI } from '@/api/studentAPI/studentAPI';
 
 
@@ -48,8 +45,6 @@ const CourseDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [expandedVideos, setExpandedVideos] = useState<Set<number>>(new Set());
 
-  const { studentInfo } = useSelector((state: RootState) => state.student);
-
   useEffect(() => {
     const fetchCourse = async () => {
       try {
@@ -76,27 +71,14 @@ const CourseDetail: React.FC = () => {
     });
   };
 
-  // const addToCart = async () => {
-  //   try {
-  //     const userId = studentInfo?._id ?? ''
-  //     await addToCartAPI(userId, course?._id ?? '');
-  //     toast.success("Coure added to cart")
-  //   } catch (error) {
-  //     console.error('Failed to add course to cart:', error);
-  //     toast.success('Could not add course to cart.');
-  //   }
-  // };
-
   const handleEnroll = async () => {
     if (!course) return;
     try {
-      const userId = studentInfo?._id ?? ''
       const stripe_key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
       const stripe = await loadStripe(stripe_key);
-      console.log(course);
       
       const session = await createCoursePaymentIntentAPI(course);
-      const result = stripe?.redirectToCheckout({
+      stripe?.redirectToCheckout({
         sessionId: session.id,
       });
 
@@ -164,18 +146,6 @@ const CourseDetail: React.FC = () => {
                     <span className="ml-1 text-yellow-400">{course.rating || 'No rating yet'}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-4">{course?.price === 0 ? 'FREE' : `₹${course?.price}`}</div>
-                  {/* <button 
-                    onClick={addToCart}
-                    className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
-                  >
-                    Add to Cart
-                  </button> */}
-                  {/* <button 
-                    onClick={handleEnroll}
-                    className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
-                  >
-                    Enroll Now
-                  </button> */}
                   <CourseEnrollmentModal 
                     course={course} 
                     onEnroll={handleEnroll}

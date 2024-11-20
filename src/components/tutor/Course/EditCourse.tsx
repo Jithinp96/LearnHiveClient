@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusCircle, X, Play, Upload } from 'lucide-react';
 import { editCourseAPI, uploadVideoAPI, uploadThumbnailAPI, fetchCategoriesAPI, fetchCourseByIdAPI } from '@/api/tutorAPI/tutorAxios';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { useParams, useNavigate } from 'react-router-dom';
 
 interface VideoInput {
@@ -61,7 +59,6 @@ const EditCourse: React.FC = () => {
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const navigate = useNavigate();
-    const { tutorInfo } = useSelector((state: RootState) => state.tutor);
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [tagInput, setTagInput] = useState('');
@@ -214,10 +211,10 @@ const EditCourse: React.FC = () => {
         setCourse({ ...course, videos: updatedVideos });
       };
 
-    const removeVideo = (index: number) => {
-        const updatedVideos = course.videos.filter((_, i) => i !== index);
-        setCourse({ ...course, videos: updatedVideos });
-    };
+    // const removeVideo = (index: number) => {
+    //     const updatedVideos = course.videos.filter((_, i) => i !== index);
+    //     setCourse({ ...course, videos: updatedVideos });
+    // };
 
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};

@@ -27,6 +27,7 @@ interface ConfirmActionDialogProps {
   confirmText?: string;
   cancelText?: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  isDisabled?: boolean;
 }
 
 const ConfirmActionDialog: React.FC<ConfirmActionDialogProps> = ({
@@ -36,7 +37,7 @@ const ConfirmActionDialog: React.FC<ConfirmActionDialogProps> = ({
   description,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  variant = 'default'
+  variant = 'default',
 }) => {
   const getTriggerElement = (): ReactNode => {
     if (triggerElement.type === 'button') {

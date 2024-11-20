@@ -12,7 +12,7 @@ export interface ValidationResult {
 }
   
 export const validateAllFieldsRequired = (fields: Record<string, string>): ValidationResult => {
-    for (const [key, value] of Object.entries(fields)) {
+    for (const [_key, value] of Object.entries(fields)) {
         if (!value) {
             return {
                 isValid: false,
@@ -62,8 +62,8 @@ export const validateRegistrationForm = (
     const mobileValidation = validateMobile(mobile);
     if (!mobileValidation.isValid) return mobileValidation;
   
-    // const passwordValidation = validatePassword(password);
-    // if (!passwordValidation.isValid) return passwordValidation;
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) return passwordValidation;
   
     const confirmPasswordValidation = validateConfirmPassword(password, confirmPassword);
     if (!confirmPasswordValidation.isValid) return confirmPasswordValidation;
@@ -104,4 +104,4 @@ export const validateSignInForm = (
     }
   
     return { isValid: true, errorMessage: '' };
-  };
+};

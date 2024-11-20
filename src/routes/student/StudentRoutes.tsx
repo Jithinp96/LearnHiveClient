@@ -12,7 +12,6 @@ import ResetPasswordPage from "../../pages/student/ResetPassowordPage";
 import ProfilePage from "../../pages/student/ProfilePage";
 import AllCourseListPage from "@/pages/student/AllCourseListPage";
 import CourseDetailPage from "@/pages/student/CourseDetailsPage";
-import CartPage from "@/pages/student/CartPage";
 import TutorProfilePage from "@/pages/student/TutorProfilePage";
 import SlotBookingPage from "@/pages/student/SlotBookingPage";
 import PaymentSuccessPage from "@/pages/student/PaymentSuccessPage";
@@ -44,7 +43,6 @@ const StudentRoutes: React.FC = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/cart" element={<CartPage />} />
         <Route path="/tutorprofile/:tutorId" element={<TutorProfilePage />} />
         <Route path="/slotbooking/:tutorId" element={<SlotBookingPage />} />
         <Route path="/paymentsuccess" element={<PaymentSuccessPage />} />

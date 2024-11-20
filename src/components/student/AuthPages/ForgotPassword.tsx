@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import FloatingLabelInput from '@/components/ui/FloatingInput';
-import AuthPageButton from '@/components/ui/AuthPageButton';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -60,14 +58,20 @@ const ForgotPassword: React.FC = () => {
                                 placeholder="Enter your email"
                                 className="w-full px-4 py-2 mb-4 text-lg border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                                 required
+                                disabled={isSubmitting}
                             />
                             <button 
                                 type="submit"
-                                className="w-full bg-[#FF4B2B] text-white rounded-[20px] border-0 py-3 px-[45px] text-xs font-bold uppercase tracking-[1px] transition-all duration-80 ease-in hover:bg-[#FF416C] active:scale-95 focus:outline-none"
+                                disabled={isSubmitting}
+                                className="w-full bg-[#FF4B2B] text-white rounded-[20px] border-0 py-3 px-[45px] text-xs font-bold uppercase tracking-[1px] transition-all duration-80 ease-in hover:bg-[#FF416C] active:scale-95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Reset Password
+                                {isSubmitting ? 'Sending...' : 'Reset Password'}
                             </button>
                         </form>
+
+                        {isSubmitting && (
+                            <p className="text-center mt-4 text-blue-600">Processing your request...</p>
+                        )}
 
                         {!isError && message && (
                             <p className="text-center mt-4 text-green-600">{message}</p>
@@ -83,12 +87,11 @@ const ForgotPassword: React.FC = () => {
                             <p className="text-lg font-[100] leading-5 tracking-[0.5px] mb-5">
                                 Enter your email to reset your password and regain access to your account.
                             </p>
-                            <AuthPageButton
-                                variant='secondary'
+                            <button 
                                 onClick={() => navigate('/auth')}
-                            >
+                                className="rounded-[20px] border border-solid border-white bg-transparent text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
                                 Back to Login
-                            </AuthPageButton>
+                            </button>
                         </div>
                     </div>
                 </div>

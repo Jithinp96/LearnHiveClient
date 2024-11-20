@@ -314,14 +314,14 @@ const ChatUI: React.FC = () => {
     
     // Set currentUserId and userRole based on selected conversation
     let selectedUserId = '';
-    let selectedUserRole = '';
+    // let selectedUserRole = '';
 
     if (conversation.participants[3] === 'Tutor') {
       selectedUserId = studentInfo?._id ?? '';
-      selectedUserRole = studentInfo?.role ?? '';
+      // selectedUserRole = studentInfo?.role ?? '';
     } else if (conversation.participants[3] === 'Student') {
       selectedUserId = tutorInfo?._id ?? '';
-      selectedUserRole = tutorInfo?.role ?? '';
+      // selectedUserRole = tutorInfo?.role ?? '';
     }
 
     // console.log("currentUserId:", selectedUserId);

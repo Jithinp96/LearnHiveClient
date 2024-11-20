@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 import { studentLoginSuccess } from "../../../redux/slices/studentSlice";
-import { loginStudentAPI, registerStudentAPI } from "../../../api/studentAPI/studentAPI";
+import { 
+  loginStudentAPI, 
+  registerStudentAPI,
+  googleLoginStudentAPI 
+} from "../../../api/studentAPI/studentAPI";
 import StudentRegistrationForm from "./StudentRegistrationForm";
 import StudentSignInForm from "./StudentSignInForm";
 
@@ -23,15 +28,49 @@ const AuthenticationForm: React.FC = () => {
     setErrorMessage(null);
   };
 
+  const handleGoogleSignIn = async (credential: string) => {
+    if (!credential) {
+      toast.error("Google credential is missing.");
+      return;
+    }
+
+    try {
+      const response = await googleLoginStudentAPI(credential);
+      if (response && response.status === 200) {
+        dispatch(studentLoginSuccess(response.data.student));
+        navigate("/dashboard");
+      } else {
+        setErrorMessage("Invalid credentials or server error. Please try again!");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        setErrorMessage(
+          error.response.data?.message ||
+          "An error occurred. Please try again!"
+        );
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again!");
+      }
+    }
+  };
+
   const handleRegister = async (
     name: string,
     email: string,
     mobile: number,
     password: string
   ) => {
-    const response = await registerStudentAPI(name, email, mobile, password);
-    if (response?.status === 201) {
-      navigate("/otp-verify", { state: { registrationType } });
+    try {
+      const response = await registerStudentAPI(name, email, mobile, password);
+      if (response?.status === 201) {
+        navigate("/otp-verify", { state: { registrationType } });
+      } 
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        setErrorMessage(error.response.data?.message || "An error occurred. Please try again!");
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again!");
+      }
     }
   };
 
@@ -57,7 +96,6 @@ const AuthenticationForm: React.FC = () => {
       }
     }
   };
-  
 
   return (
     <div className="bg-[#f6f5f7] flex justify-center items-center flex-col font-['Montserrat',sans-serif] min-h-screen py-5 px-4">
@@ -66,7 +104,7 @@ const AuthenticationForm: React.FC = () => {
         <div className="md:hidden w-full">
           {isSignUp ? (
             <div className="flex flex-col mt-10">
-              <StudentRegistrationForm onRegister={handleRegister} />
+              <StudentRegistrationForm onRegister={handleRegister} errorMessage={errorMessage} />
               <div className="text-center pb-6">
                 <p className="text-sm text-gray-600 mt-8">Already have an account?</p>
                 <a 
@@ -80,7 +118,12 @@ const AuthenticationForm: React.FC = () => {
             </div>
           ) : (
             <div className="flex flex-col mt-24">
-              <StudentSignInForm onSignIn={handleSignIn} errorMessage={errorMessage} loading={loading} />
+              <StudentSignInForm 
+                onSignIn={handleSignIn} 
+                onGoogleSignIn={handleGoogleSignIn}
+                errorMessage={errorMessage} 
+                loading={loading} 
+              />
               <div className="text-center pb-6">
                 <p className="text-sm text-gray-600 mt-8">Don't have an account?</p>
                 <a 
@@ -99,12 +142,17 @@ const AuthenticationForm: React.FC = () => {
         <div className="hidden md:block">
           <div className={`absolute top-0 h-full transition-all duration-600 ease-in-out w-1/2 
             ${!isSignUp ? "transform translate-x-full opacity-0 z-1" : "opacity-100 z-5"}`}>
-            <StudentRegistrationForm onRegister={handleRegister} />
+            <StudentRegistrationForm onRegister={handleRegister} errorMessage={errorMessage}/>
           </div>
 
           <div className={`absolute top-0 h-full transition-all duration-600 ease-in-out w-1/2 
             ${isSignUp ? "transform translate-x-full opacity-0 z-1" : "opacity-100 z-5"}`}>
-            <StudentSignInForm onSignIn={handleSignIn} errorMessage={errorMessage} loading={loading}/>
+            <StudentSignInForm 
+                onSignIn={handleSignIn} 
+                onGoogleSignIn={handleGoogleSignIn}
+                errorMessage={errorMessage} 
+                loading={loading} 
+              />
           </div>
         </div>
 

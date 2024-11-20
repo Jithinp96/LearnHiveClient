@@ -63,7 +63,7 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
   const [isResendDisabled, setIsResendDisabled] = useState(false);
 
   const navigate = useNavigate()
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     startTimer();
@@ -114,22 +114,15 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
             navigate(registrationType === 'student' ? '/auth' : '/tutor/auth')
           } else {
             toast.error("Invalid OTP. Please try again!")
-            console.log('OTP verification failed:', response.data.message);
             setErrorMessage(response.data.message || 'Invalid OTP');
           }
         } else {
-          
-          console.error('API returned error:', response.status, response.data);
           setErrorMessage(response.data.message || 'An unexpected error occurred');
         }
 
       } catch (error) {
-        console.error('Error during OTP verification:', error);
         if (axios.isAxiosError(error)) {
-          const errorMessage = error.response?.data?.message || 'Network error';
-          console.log("Here");
-          
-          setErrorMessage(errorMessage);
+          setErrorMessage(error.response?.data?.message || 'Network error');
         } else {
           setErrorMessage('An unknown error occurred');
         }
@@ -141,7 +134,7 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
 
   const handleResendOTP = async () => {
     try {
-      console.log('Resending OTP...');
+      const loadingToastId = toast.loading('Resending OTP...');
       const endpoint = registrationType === 'student' ? '/students/resend-otp' : '/tutor/resend-otp';
   
       const response = await axios.post(`${import.meta.env.VITE_API_URL}${endpoint}`, {}, 
@@ -149,20 +142,16 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
         withCredentials: true,
       });
   
-      console.log("Resend OTP Response: ", response);
-  
       if (response.status >= 200 && response.status < 300) {
-        console.log('OTP resent successfully');
+        toast.dismiss(loadingToastId);
+        toast.success("OTP Resend Successfully! Please check you email!")
         startTimer();
       } else {
-        console.error('Failed to resend OTP:', response.data.message);
         setErrorMessage(response.data.message || 'Failed to resend OTP');
       }
     } catch (error) {
-      console.error('Error during OTP resend:', error);
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || 'Network error';
-        setErrorMessage(errorMessage);
+        setErrorMessage(error.response?.data?.message || 'Network error');
       } else {
         setErrorMessage('An unknown error occurred');
       }
@@ -172,12 +161,18 @@ const OTPForm: React.FC<OTPFormProps> = ({ registrationType }) => {
   return (
     <>
       <h2 hidden>{registrationType === 'student' ? 'Student Verification' : 'Tutor Verification'}</h2>
-    
       <div className="bg-[#f6f5f7] flex justify-center items-center flex-col font-['Montserrat',sans-serif] min-h-screen py-10">
         <div className="bg-white rounded-[10px] shadow-[0_14px_28px_rgba(0,0,0,0.25),0_10px_10px_rgba(0,0,0,0.22)] relative overflow-hidden w-[800px] max-w-full min-h-[600px]">
           {/* Left side - OTP Verification */}
           <div className="absolute top-0 left-0 w-1/2 h-full flex items-center justify-center">
             <div className="w-full max-w-md p-8">
+            <div className="flex justify-center mb-8">
+              <img
+                className="h-16"
+                src="https://learnhive.s3.ap-south-1.amazonaws.com/assets/logo/Logo.png"
+                alt="Logo"
+              />
+            </div>
               <h2 className="text-3xl font-bold text-center mb-8">Verify Your Account</h2>
               <p className="text-center mb-8">We've sent a code to your email. Please enter it below.</p>
               

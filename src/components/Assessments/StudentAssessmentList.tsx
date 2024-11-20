@@ -3,12 +3,17 @@ import { Clock, Book, CheckCircle, ArrowRight } from 'lucide-react';
 import { fetchAssessmentForStudentAPI } from '@/api/assessmentAPI/assessmentAPI';
 import { useNavigate } from 'react-router-dom';
 
+interface CourseId {
+    title: string
+}
+
 interface Assessment {
   _id: string;
   title: string;
+  courseId: CourseId;
   description: string;
   duration: number;
-  questions: number;
+  questions: [];
   passingScore: number;
   status: 'not-started' | 'completed' | 'in-progress';
   dueDate?: string;
