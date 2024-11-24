@@ -25,4 +25,13 @@ export interface Course {
     reviews: Review[];
     comments: Comment[];
     purchaseCount: number;
+    progress?: CourseProgress;
 }
+
+export interface CourseProgress {
+    completedVideos: string[];
+    progressPercentage: number;
+    lastWatchedVideo: string | null;
+    isCompleted: boolean;
+}
+

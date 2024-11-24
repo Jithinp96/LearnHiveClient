@@ -124,10 +124,16 @@ export const fetchAllCoursesAPI = async (params: {
 
 export const fetchCoursesDetailsAPI = async (courseId: string) => {
     try {
-        return await axiosInstance.get(`/students/course/${courseId}`,
-        {
-            withCredentials:true
-        })
+        return await axiosInstance.get(`/students/course/${courseId}`)
+    } catch (error) {
+        console.error("Error in fetching course details:", error);
+    }
+}
+
+export const fetchCoursesViewerAPI = async (courseId: string) => {
+    try {
+        console.log("Reached fetchCoursesViewerAPI: ", courseId);
+        return await axiosInstance.get(`/students/course-view/${courseId}`)
     } catch (error) {
         console.error("Error in fetching course details:", error);
     }
@@ -242,9 +248,12 @@ export const createCoursePaymentIntentAPI = async (courseDetails: object) => {
     }
 };
 
-export const initializeProgressAPI = async (courseId: string, totalVideos: number) => {
-    const response = await axiosInstance.post(`/students/initialize-course-progress`, { courseId, totalVideos});
-    return response.data;
+export const updateCourseProgressAPI  = async (courseId: string, videoId: string) => {
+    console.log("{ courseId, videoId} from updateCourseProgressAPI: ", courseId, videoId);
+    
+    const response = await axiosInstance.put(`/students/course-progress`, { courseId, videoId});
+    console.log("response from updateCourseProgressAPI: ", response);
+    return response;
 };
 
 export const getCourseOrderDetailsAPI = async () => {
