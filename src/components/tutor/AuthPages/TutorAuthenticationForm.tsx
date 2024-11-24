@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { tutorLoginSuccess } from "../../../redux/slices/tutorSlice";
 
-import { loginTutorAPI, registerTutorAPI } from "../../../api/tutorAPI/tutorAxios";
+import { tutorLoginSuccess } from "../../../redux/slices/tutorSlice";
+import { googleLoginTutorAPI, loginTutorAPI, registerTutorAPI } from "../../../api/tutorAPI/tutorAxios";
 
 import TutorRegistrationForm from "./TutorRegistrationForm";
 import TutorSignInForm from "./TutorSignInForm";
@@ -23,16 +25,48 @@ const TutorAuthenticationForm: React.FC = () => {
         setErrorMessage(null);
     };
 
+    const handleGoogleSignIn = async (credential: string) => {
+        if (!credential) {
+          toast.error("Google credential is missing.");
+          return;
+        }
+    
+        try {
+          const response = await googleLoginTutorAPI(credential);
+          if (response && response.status === 200) {
+            dispatch(tutorLoginSuccess(response.data.tutor));
+            navigate("/tutor/dashboard");
+          } else {
+            setErrorMessage("Invalid credentials or server error. Please try again!");
+          }
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response) {
+            setErrorMessage(
+              error.response.data?.message || "An error occurred. Please try again!"
+            );
+          } else {
+            setErrorMessage("An unexpected error occurred. Please try again!");
+          }
+        }
+      };
+
     const handleRegister = async (
         name: string,
         email: string,
         mobile: number,
         password: string
     ) => {
+       try {
         const response = await registerTutorAPI(name, email, mobile, password);
-        
-        if (response?.status === 201) {
-            navigate("/otp-verify", { state: { registrationType } });
+            if (response?.status === 201) {
+                navigate("/otp-verify", { state: { registrationType } });
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                setErrorMessage(error.response.data?.message || "An error occurred. Please try again!");
+            } else {
+                setErrorMessage("An unexpected error occurred. Please try again!");
+            }
         }
     };
 
@@ -40,14 +74,23 @@ const TutorAuthenticationForm: React.FC = () => {
         setLoading(true);
         setErrorMessage(null);
 
-        const response = await loginTutorAPI(email, password);
-        setLoading(false);
-
-        if(response && response.status === 200) {
-            dispatch(tutorLoginSuccess(response.data.tutor));
-            navigate("/tutor/dashboard");
-        } else {
-            console.error("Invalid credentials or server error");
+        
+        try {
+            const response = await loginTutorAPI(email, password);
+            setLoading(false);
+            if(response && response.status === 200) {
+                dispatch(tutorLoginSuccess(response.data.tutor));
+                navigate("/tutor/dashboard");
+            } else {
+                setErrorMessage("Invalid credentials or server error. Please try again!");
+            }
+        } catch (error) {
+            setLoading(false);
+            if (axios.isAxiosError(error) && error.response) {
+                setErrorMessage(error.response.data?.message || "An error occurred. Please try again!");
+            } else {
+                setErrorMessage("An unexpected error occurred. Please try again!");
+            }
         }
     };
 
@@ -58,7 +101,7 @@ const TutorAuthenticationForm: React.FC = () => {
                 <div className="md:hidden w-full">
                     {isSignUp ? (
                         <div className="flex flex-col mt-10">
-                            <TutorRegistrationForm onRegister={handleRegister} />
+                            <TutorRegistrationForm onRegister={handleRegister} errorMessage={errorMessage}/>
                             <div className="text-center pb-6">
                                 <p className="text-sm text-gray-600 mt-8">Already have an account?</p>
                                 <a 
@@ -72,7 +115,11 @@ const TutorAuthenticationForm: React.FC = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col mt-24">
-                            <TutorSignInForm onSignIn={handleSignIn} errorMessage={errorMessage} loading={loading} />
+                            <TutorSignInForm 
+                                onSignIn={handleSignIn} 
+                                onGoogleSignIn={handleGoogleSignIn}
+                                errorMessage={errorMessage} 
+                                loading={loading} />
                             <div className="text-center pb-6">
                                 <p className="text-sm text-gray-600 mt-8">Don't have an account?</p>
                                 <a 
@@ -91,12 +138,17 @@ const TutorAuthenticationForm: React.FC = () => {
                 <div className="hidden md:block">
                     <div className={`absolute top-0 h-full transition-all duration-600 ease-in-out w-1/2 
                         ${!isSignUp ? "transform translate-x-full opacity-0 z-1" : "opacity-100 z-5"}`}>
-                        <TutorRegistrationForm onRegister={handleRegister} />
+                        <TutorRegistrationForm onRegister={handleRegister} errorMessage={errorMessage}/>
                     </div>
 
                     <div className={`absolute top-0 h-full transition-all duration-600 ease-in-out w-1/2 
                         ${isSignUp ? "transform translate-x-full opacity-0 z-1" : "opacity-100 z-5"}`}>
-                        <TutorSignInForm onSignIn={handleSignIn} errorMessage={errorMessage} loading={loading}/>
+                        <TutorSignInForm 
+                            onSignIn={handleSignIn} 
+                            onGoogleSignIn={handleGoogleSignIn}
+                            errorMessage={errorMessage} 
+                            loading={loading}
+                        />
                     </div>
                 </div>
 

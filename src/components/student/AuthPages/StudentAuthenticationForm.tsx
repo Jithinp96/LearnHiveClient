@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 import { studentLoginSuccess } from "../../../redux/slices/studentSlice";
-import { 
-  loginStudentAPI, 
-  registerStudentAPI,
-  googleLoginStudentAPI 
-} from "../../../api/studentAPI/studentAPI";
+import { loginStudentAPI, registerStudentAPI, googleLoginStudentAPI } from "../../../api/studentAPI/studentAPI";
+
 import StudentRegistrationForm from "./StudentRegistrationForm";
 import StudentSignInForm from "./StudentSignInForm";
 

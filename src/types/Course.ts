@@ -6,7 +6,8 @@ export interface Course {
     _id: string;
     tutorId: { 
         _id: string; 
-        name: string 
+        name: string;
+        profileImage: string;
     };
     title: string;
     description: string;

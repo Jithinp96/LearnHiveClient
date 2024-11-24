@@ -10,7 +10,7 @@ export const registerTutorAPI = async (name: string, email: string, mobile: numb
             password,
         });
     } catch (error) {
-        console.error("Error in registerTutorAPI:", error);
+        throw error
     }
 };
 
@@ -19,7 +19,7 @@ export const tutorOTPVerifyAPI = async (otp: string) => {
     try {
         return await axiosInstance.post("/tutor/otp-verify", { otp });
     } catch (error) {
-        console.error("Error in tutorOTPVerifyAPI:", error);
+        throw error
     }
 };
 
@@ -28,7 +28,15 @@ export const loginTutorAPI = async (email: string, password: string) => {
     try {
         return await axiosInstance.post("/tutor/login", { email, password });
     } catch (error) {
-        console.error("Error in loginTutorAPI:", error);
+        throw error
+    }
+};
+
+export const googleLoginTutorAPI = async (credentials: string) => {
+    try {
+      return await axiosInstance.post('/tutor/google-login', { credentials });
+    } catch (error) {
+      throw error;
     }
 };
 
@@ -37,7 +45,8 @@ export const logoutTutorAPI = async (role: string) => {
     try {
         return await axiosInstance.post(`/tutor/logout/${role}`);
     } catch (error) {
-        console.error("Error in logoutTutorAPI:", error);
+        // console.error("Error in logoutTutorAPI:", error);
+        throw error;
     }
 };
 
@@ -46,7 +55,8 @@ export const tutorForgotPasswordAPI = async (email: string) => {
     try {
         return await axiosInstance.post("/tutor/forgot-password", { email });
     } catch (error) {
-        console.error("Error in tutorForgotPasswordAPI:", error);
+        // console.error("Error in tutorForgotPasswordAPI:", error);
+        throw error;
     }
 };
 
@@ -55,7 +65,8 @@ export const tutorResetPasswordAPI = async (newPassword: string, token: string |
     try {
         return await axiosInstance.post(`/tutor/reset-password?token=${token}`, { newPassword });
     } catch (error) {
-        console.error("Error in tutorResetPasswordAPI:", error);
+        // console.error("Error in tutorResetPasswordAPI:", error);
+        throw error;
     }
 };
 
@@ -65,7 +76,8 @@ export const getTutorDashboardAPI = async() => {
         console.log("response of getDashboard: ", response);
         return response
     } catch (error) {
-        console.error("Error in fetching tutor dashboard from api file:", error);
+        // console.error("Error in fetching tutor dashboard from api file:", error);
+        throw error;
     }
 }
 
@@ -74,7 +86,8 @@ export const getTutorDetailsAPI = async (id: string) => {
     try {
         return await axiosInstance.get(`/tutor/profile/${id}`);
     } catch (error) {
-        console.error("Error in getTutorDetailsAPI:", error);
+        // console.error("Error in getTutorDetailsAPI:", error);
+        throw error;
     }
 };
 
@@ -86,7 +99,8 @@ export const addTutorEducationAPI = async (id: string, educationData: any) => {
             educationData
         );
     } catch (error) {
-        console.error("Error adding education:", error);
+        // console.error("Error adding education:", error);
+        throw error;
     }
 };
 
@@ -97,7 +111,7 @@ export const editTutorEducationAPI = async (id: string, educationId: string, upd
             updatedEducation
         )
     } catch (error) {
-        console.error("Error editing education:", error);
+        // console.error("Error editing education:", error);
         throw error;
     }
 }
@@ -108,7 +122,7 @@ export const deleteTutorEducationAPI = async(id: string, educationId: string) =>
             `/tutor/profile/${id}/delete-education/${educationId}`
         )
     } catch (error) {
-        console.error("Error deleting education:", error);
+        // console.error("Error deleting education:", error);
         throw error;
     }
 }
@@ -123,7 +137,8 @@ export const updateTutorNameAPI = async (id: string, newName: string) => {
             }
         )
     } catch (error) {
-        console.error("Error in updating name:", error);
+        // console.error("Error in updating name:", error);
+        throw error;
     }
 }
 
@@ -140,22 +155,15 @@ export const updateTutorProfileImageAPI = async (id: string, newImageFile: File)
             }
         );
     } catch (error) {
-        console.error("Error uploading profile pic:", error);
         throw error;
     }
 }
 
 export const updateTutorMobileAPI = async (id: string, newNumber: number) => {
     try {
-        return await axiosInstance.put(
-            `/tutor/profile/edit-mobile`,
-            {
-                id,
-                newNumber
-            }
-        )
+        return await axiosInstance.put( `/tutor/profile/edit-mobile`, { id, newNumber })
     } catch (error) {
-        console.error("Error in updating name:", error);
+        throw error;
     }
 }
 
@@ -169,7 +177,7 @@ export const addTutorSubjectAPI = async (tutorId: string, subjectData: object) =
             }
         )
     } catch (error) {
-        console.error("Error in updating name:", error);
+        throw error;
     }
 }
 
@@ -184,7 +192,7 @@ export const editTutorSubjectAPI = async (tutorId: string, subjectId: string, ed
             }
         )
     } catch (error) {
-        console.error("Error in updating name:", error);
+        throw error;
     }
 }
 
@@ -198,7 +206,7 @@ export const deleteTutorSubjectAPI = async (tutorId: string, subjectId: string) 
             }
         )
     } catch (error) {
-        console.error("Error in updating name:", error);
+        throw error;
     }
 }
 
@@ -207,7 +215,6 @@ export const fetchSubjectsAPI = async() => {
         const response = await axiosInstance.get('/tutor/getSubjects');
         return response;
     } catch (error) {
-        console.error("Error in loading course categories:", error);
         throw error;
     }
 }
@@ -240,7 +247,6 @@ export const addCourseAPI = async (
             videos,
         });
     } catch (error) {
-        console.error("Error adding course:", error);
         throw error;
     }
 };
@@ -256,7 +262,6 @@ export const uploadVideoAPI = async (file: File) => {
 
     return response.data;
     } catch (error) {
-        console.error("Error uploading video:", error);
         throw error;
     }
 };
@@ -269,11 +274,9 @@ export const uploadThumbnailAPI = async(file: File) => {
         const response = await axiosInstance.post("/tutor/upload-thumbnail", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        console.log("Response: ", response);
         
         return response.data;
     } catch (error) {
-        console.error("Error uploading thumbnail:", error);
         throw error;
     }
 }
@@ -306,7 +309,7 @@ export const editCourseAPI = async(
             videos,
         });
     } catch (error) {
-        
+        throw error;
     }
 }
 
@@ -314,7 +317,7 @@ export const fetchCourseByIdAPI = async(courseId: string) => {
     try {
         return await axiosInstance.get(`/tutor/edit-course/${courseId}`)
     } catch (error) {
-        
+        throw error;
     }
 }
 
@@ -323,7 +326,6 @@ export const fetchCategoriesAPI = async() => {
         const response = await axiosInstance.get('/tutor/getcategories');
         return response;
     } catch (error) {
-        console.error("Error in loading course categories:", error);
         throw error;
     }
 }
@@ -335,7 +337,6 @@ export const fetchTutorCoursesAPI = async(id: string) => {
         });
         return response
     } catch (error) {
-        console.error("Error in loading course list:", error);
         throw error;
     }
 }
@@ -344,7 +345,6 @@ export const fetchSlotsAPI = async() => {
     try {
         return await axiosInstance.get('/tutor/appointment')
     } catch (error) {
-        console.error("Error in loading slots list:", error);
         throw error;
     }
 }
@@ -353,7 +353,6 @@ export const createSlotAPI = async(slotData: object) => {
     try {
         return await axiosInstance.post('/tutor/addslot', slotData)
     } catch (error) {
-        console.error("Error in creating slot:", error);
         throw error;
     }
 }
@@ -362,7 +361,6 @@ export const generateSlotsAPI = async(data: { tutorId: string; subject: string; 
     try {
         return await axiosInstance.post('/tutor/generate-slots', data);
     } catch (error) {
-        console.error("Error in generating slots:", error);
         throw error;
     }
 };
@@ -373,7 +371,6 @@ export const generateSlotsPreferenceAPI = async(data: { tutorId: string; subject
         
         return await axiosInstance.post('/tutor/generate-slots-preference', data);
     } catch (error) {
-        console.error("Error in generating slots:", error);
         throw error;
     }
 };
@@ -382,7 +379,6 @@ export const editSlotAPI = async(slotId: string, slotData: object) => {
     try {
         return await axiosInstance.put('/tutor/editslot', { slotData, slotId })
     } catch (error) {
-        console.error("Error in creating slot:", error);
         throw error;
     }
 }

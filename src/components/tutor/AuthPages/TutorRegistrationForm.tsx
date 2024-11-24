@@ -6,9 +6,13 @@ import { passwordRules, validateRegistrationForm } from '@/utils/Validations';
 
 interface SignUpProps {
   onRegister: (name: string, email: string, mobile: number, password: string) => void;
+  errorMessage: string | null;
 }
 
-const TutorRegistrationForm: React.FC<SignUpProps> = ({ onRegister }) => {
+const TutorRegistrationForm: React.FC<SignUpProps> = ({ 
+  onRegister,
+  errorMessage: serverErrorMessage,
+}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
@@ -106,9 +110,10 @@ const TutorRegistrationForm: React.FC<SignUpProps> = ({ onRegister }) => {
           className="bg-[#eee] border-none py-3 px-[15px] my-2 w-full"
         />
         <ErrorMessage message={errorMessage} />
+        {serverErrorMessage && <ErrorMessage message={serverErrorMessage} />}
         <button
           type="submit"
-          className="rounded-[20px] border border-solid border-[#FF4B2B] bg-[#FF4B2B] text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in mt-[15px] active:scale-95 focus:outline-none"
+          className="rounded-[20px] border  bg-gradient-to-r from-[#1c8b5d] to-[#48ffb3] text-white text-xs font-bold py-3 px-[45px] uppercase tracking-[1px] transition-transform duration-80 ease-in mt-[15px] active:scale-95 focus:outline-none"
         >
           Proceed
         </button>
