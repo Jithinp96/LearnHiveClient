@@ -113,7 +113,7 @@ const CourseViewer: React.FC = () => {
               className="w-full h-full"
               controls
               playsInline
-              controlsList="nodownload"
+              controlsList="nodownload" 
               onTimeUpdate={handleVideoTimeUpdate}
               onEnded={handleVideoEnded}
             />

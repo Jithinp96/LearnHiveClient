@@ -5,6 +5,7 @@ import { RootState } from '../../../redux/store';
 import { logoutStudent } from '../../../redux/slices/studentSlice';
 import { logoutStudentAPI } from '../../../api/studentAPI/studentAPI';
 import { ShoppingCart, Library, Home, BookOpen, Video, BookCheck, MessageCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +24,14 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    const response = await logoutStudentAPI('student')
-    console.log(response);
-    
-    dispatch(logoutStudent());
-    navigate('/auth');
+    const response = await logoutStudentAPI()
+    if(response.status === 200) {
+      toast.success(response.data.message)
+      dispatch(logoutStudent());
+      navigate('/auth');
+    } else {
+      toast.error("Logout failed. Please try again!")
+    }
   };
 
   return (

@@ -24,7 +24,7 @@ export const googleLoginStudentAPI = async (credentials: string) => {
     }
 };
 
-export const logoutStudentAPI = async (role: string) => {
+export const logoutStudentAPI = async () => {
     try {
         // return await axios.post(
         //     `${import.meta.env.VITE_API_URL}/students/logout/${role}`, 
@@ -34,7 +34,7 @@ export const logoutStudentAPI = async (role: string) => {
         //     }
         // );
 
-        return axiosInstance.post(`/students/logout/${role}`)
+        return axiosInstance.post(`/students/logout`)
     } catch (error) {
         throw error
     }
@@ -141,11 +141,8 @@ export const fetchCoursesViewerAPI = async (courseId: string) => {
 
 export const getDashboardAPI = async () => {
     try {
-        return await axiosInstance.get(`/students/dashboard`,
-            {
-                withCredentials:true
-            }
-        )
+        const response = await axiosInstance.get(`/students/dashboard`);
+        return response.data
     } catch (error) {
         console.error("Error in loading dashboard:", error);
     }
@@ -262,6 +259,15 @@ export const getCourseOrderDetailsAPI = async () => {
         return response.data
     } catch (error) {
         console.error("Error in getCourseOrderDetailsAPI:", error);
+    }
+}
+
+export const getStudentCourseProgressAPI = async() => {
+    try {
+        const response = await axiosInstance.get('/students/allcourse-progress');
+        return response.data
+    } catch (error) {
+        throw error
     }
 }
 
