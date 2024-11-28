@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Settings, Paperclip, Smile, Send } from 'lucide-react';
 import { Message, Conversation } from './ChatUI';
 import { getUserMessageAPI } from '@/api/communicationAPI/chatAPI';
@@ -22,9 +22,37 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   inputText,
   setInputText,
   sendMessage,
-  formatDate,
   currentUserId,
 }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Improved date formatting function
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+
+    // Get hours and minutes, format in 12-hour clock
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -34,11 +62,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   useEffect(()=>{
     socket.on('receiveMessage',(data)=>{
-        console.log("data from socket.on receive: ", data);
-      
-        const standardizedData = {
-          ...data,
-          message: data.message || data.text,
+      const standardizedData = {
+        ...data,
+        message: data.message || data.text,
       };
 
       setMessages((prev) => [...prev, standardizedData]);
@@ -49,7 +75,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     const fetchUserConversation = async () => {
       if (selectedConversation) {
         const userConversations = await getUserMessageAPI(selectedConversation.participants[0]);
-        // console.log('userConversations: ', userConversations);
         setMessages(userConversations.messages);
       }
     };
@@ -100,11 +125,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 )}
               </div>
               <p className="text-xs text-gray-400 mt-1 text-right">
-                {formatDate(message.time)}
+                {formatDate(message.createdAt ?? "")}
               </p>
             </div>
           </div>
         ))}
+        {/* Invisible div to scroll to */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}

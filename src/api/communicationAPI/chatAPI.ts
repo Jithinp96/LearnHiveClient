@@ -28,3 +28,12 @@ export const sendMessageAPI = async (newMessage: object) => {
         throw error;
     }
 };
+
+export const validateVideoCallAPI = async (roomId: string, userId: string, userType: string) => {
+    try {
+        const response = await axiosInstance.post('/video-call/validate', { roomId, userId, userType });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}

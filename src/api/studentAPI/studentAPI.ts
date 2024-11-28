@@ -107,16 +107,17 @@ export const fetchAllCoursesAPI = async (params: {
     search?: string;
     categories?: string[];
     levels?: string[];
+    studentId?: string
 }) => {
     try {
         const queryParams = new URLSearchParams();
         if (params.search) queryParams.append('search', params.search);
+
         if (params.categories?.length) queryParams.append('categories', params.categories.join(','));
         if (params.levels?.length) queryParams.append('levels', params.levels.join(','));
+        if (params.studentId) queryParams.append('studentId', params.studentId);
 
-        return await axiosInstance.get(`/students/allcourses?${queryParams.toString()}`, {
-            withCredentials: true,
-        });
+        return await axiosInstance.get(`/students/allcourses?${queryParams.toString()}`);
     } catch (error) {
         throw error;
     }
@@ -253,9 +254,9 @@ export const updateCourseProgressAPI  = async (courseId: string, videoId: string
     return response;
 };
 
-export const getCourseOrderDetailsAPI = async () => {
+export const getCourseOrderDetailsAPI = async (page: number, limit = 6) => {
     try {
-        const response = await axiosInstance.get(`/students/course-orders`)
+        const response = await axiosInstance.get(`/students/course-orders?page=${page}&limit=${limit}`)
         return response.data
     } catch (error) {
         console.error("Error in getCourseOrderDetailsAPI:", error);
@@ -271,9 +272,9 @@ export const getStudentCourseProgressAPI = async() => {
     }
 }
 
-export const getSlotOrderDetailsAPI = async () => {
+export const getSlotOrderDetailsAPI = async (page: number, limit = 5) => {
     try {
-        const response = await axiosInstance.get(`/students/slot-orders`)
+        const response = await axiosInstance.get(`/students/slot-orders?page=${page}&limit=${limit}`)
         return response.data
     } catch (error) {
         console.error("Error in getSLotOrderDetailsAPI:", error);

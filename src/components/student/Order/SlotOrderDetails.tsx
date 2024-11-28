@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { MessageSquare, Check, Link as LinkIcon } from 'lucide-react';
+import { MessageSquare, Check, Link as LinkIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { cancelSlotOrderAPI, getSlotOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
@@ -22,12 +22,19 @@ interface Order {
     createdAt: string;
     amount: number;
     sessionStatus: string;
+    refundId?: string;
 }
 
 const SlotOrderList: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalOrders: 0
+    });
     const [isCanceling, setIsCanceling] = useState<{ [key: string]: boolean }>({});
     const [copiedLinks, setCopiedLinks] = useState<{ [key: string]: boolean }>({});
+    const [isLoading, setIsLoading] = useState(true);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -39,18 +46,34 @@ const SlotOrderList: React.FC = () => {
         });
     };
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await getSlotOrderDetailsAPI();
-                setOrders(response);
-            } catch (error) {
-                toast.error("Failed to fetch slot orders. Please try again!");
-            }
-        };
+    const fetchOrders = async (page = 1) => {
+        try {
+            setIsLoading(true);
+            const response = await getSlotOrderDetailsAPI(page);
+            console.log("response from slotOrderDetails: ", response);
+            
+            setOrders(response.slotOrders);
+            setPagination({
+                currentPage: response.currentPage,
+                totalPages: response.totalPages,
+                totalOrders: response.totalOrders
+            });
+        } catch (error) {
+            toast.error("Failed to fetch slot orders. Please try again!");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchOrders();
     }, []);
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage > 0 && newPage <= pagination.totalPages) {
+            fetchOrders(newPage);
+        }
+    };
 
     const handleCancelOrder = async (orderId: string) => {
         try {
@@ -58,7 +81,8 @@ const SlotOrderList: React.FC = () => {
             await cancelSlotOrderAPI(orderId);
             toast.success("Slot cancelled and refund initiated!");
 
-            setOrders(prevOrders => prevOrders.filter(order => order._id !== orderId));
+            // Refetch current page to ensure updated data
+            fetchOrders(pagination.currentPage);
         } catch (error) {
             toast.error("Failed to cancel the slot. Please try again.");
         } finally {
@@ -78,11 +102,6 @@ const SlotOrderList: React.FC = () => {
         } catch (error) {
             toast.error("Failed to copy link");
         }
-    };
-
-    const handleDelete = (id: string) => {
-        console.log("Id got: ", id);
-        handleCancelOrder(id);
     };
 
     const getStatusClasses = (status: string) => {
@@ -127,14 +146,22 @@ const SlotOrderList: React.FC = () => {
                 <div className="grid grid-cols-12 p-4 border-b text-gray-500 font-medium">
                     <div className="col-span-3">Details</div>
                     <div className="col-span-3">Slot Date</div>
-                    <div className="col-span-2">Purchase Date</div>
-                    <div className="col-span-2">Price</div>
-                    <div className="col-span-1">Session Status</div>
+                    <div className="col-span-3">Purchase Date</div>
+                    <div className="col-span-1">Price</div>
+                    <div className="col-span-1">Status</div>
                     <div className="col-span-1">Action</div>
                 </div>
 
-                {orders.map((order) => {
-                    const uniqueKey = `${order._id}-${order.slotId.subject}`;
+                {isLoading ? (
+                    <div className="text-center py-4">Loading...</div>
+                ) : orders.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500">No slot orders found</div>
+                ) : (
+                    orders.map((order) => {
+                        const uniqueKey = `${order._id}-${order.slotId.subject}`;
+                        const isCancelled = order.sessionStatus === 'Cancelled';
+                        // const isCompleted = order.sessionStatus === 'Completed';
+                        const isScheduled = order.sessionStatus === 'Scheduled';
 
                     return (
                         <div key={uniqueKey} className="grid grid-cols-12 p-4 border-b items-center hover:bg-gray-50">
@@ -152,7 +179,7 @@ const SlotOrderList: React.FC = () => {
                                         <p className="font-medium">{formatDate(order.slotId.date)}</p>
                                         <p className="text-sm text-gray-500">{order.slotId.startTime} - {order.slotId.endTime}</p>
                                     </div>
-                                    {order.slotId.meetingLink && (
+                                    {isScheduled && order.slotId.meetingLink && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -174,34 +201,66 @@ const SlotOrderList: React.FC = () => {
                                     )}
                                 </div>
                             </div>
-                            <div className="col-span-2 text-gray-500">{formatDate(order.createdAt)}</div>
-                            <div className="col-span-2 font-medium">₹{order.amount}</div>
+                            <div className="col-span-3 text-gray-500">{formatDate(order.createdAt)}</div>
+                            <div className="col-span-1 font-medium">₹{order.amount}</div>
                             <div className="col-span-1 flex items-center justify-between">
                                 <span className={`px-3 py-1 rounded-full text-sm ${getStatusClasses(order.sessionStatus)}`}>
                                     {order.sessionStatus}
                                 </span>
                             </div>
                             <div className="col-span-1">
-                            <ConfirmActionDialog
-                                title="Cancel Slot Order"
-                                triggerElement={{
-                                    type: 'button',
-                                    content: isCanceling[order._id] ? 'Cancelling...' : 'Cancel',
-                                }}
-                                isDisabled={isCanceling[order._id]} // New prop to indicate if the action is disabled
-                                description="Are you sure you want to cancel this slot? This action cannot be undone."
-                                confirmText="Confirm Cancel"
-                                cancelText="Close"
-                                onConfirm={() => handleDelete(order._id)}
-                                variant="destructive"
-                            />
+                                {isCancelled && order.refundId ? (
+                                    <div className="text-sm text-gray-600 truncate">
+                                        Refunded
+                                    </div>
+                                ) : (isScheduled && (
+                                    <ConfirmActionDialog
+                                        title="Cancel Slot Order"
+                                        triggerElement={{
+                                            type: 'button',
+                                            content: isCanceling[order._id] ? 'Cancelling...' : 'Cancel',
+                                        }}
+                                        isDisabled={isCanceling[order._id]}
+                                        description="Are you sure you want to cancel this slot? This action cannot be undone."
+                                        confirmText="Confirm Cancel"
+                                        cancelText="Close"
+                                        onConfirm={() => handleCancelOrder(order._id)}
+                                        variant="destructive"
+                                    />
+                                ))}
                             </div>
                         </div>
                     );
-                })}
-            </div>
+                })
+            )}
         </div>
-    );
+
+        {/* Pagination Controls */}
+        {pagination.totalPages > 1 && (
+            <div className="flex justify-center items-center mt-4 space-x-2">
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    disabled={pagination.currentPage === 1}
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-gray-500">
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                </span>
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
+        )}
+    </div>
+);
 };
 
 export default SlotOrderList;

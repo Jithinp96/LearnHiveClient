@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { fetchAllCoursesAPI, fetchCategoriesAPI, getCourseOrderDetailsAPI } from '@/api/studentAPI/studentAPI';
+import { fetchAllCoursesAPI, fetchCategoriesAPI } from '@/api/studentAPI/studentAPI';
 import { RootState } from '@/redux/store';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -27,12 +27,11 @@ interface Course {
     thumbnailUrl: string;
 }
 
-const levels = ['Beginner', 'Intermediate', 'Expert'];
+const levels = ['beginner', 'intermediate', 'expert'];
 
 const AllCourseList: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [purchasedCourses, setPurchasedCourses] = useState<string[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -56,30 +55,26 @@ const AllCourseList: React.FC = () => {
         fetchCategories();
     }, []);
 
+    const fetchCourses = async () => {
+        setIsLoading(true);
+        try {
+            const coursesResponse = await fetchAllCoursesAPI({
+                search: debouncedSearch,
+                categories: selectedCategories,
+                levels: selectedLevels,
+                studentId: studentInfo?._id
+            });
+    
+            setCourses(coursesResponse?.data);
+        } catch (error) {
+            toast.error("Error loading course list. Please try again!");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchCourses = async () => {
-            setIsLoading(true);
-            try {
-                const [coursesResponse, purchasedResponse] = await Promise.all([
-                    fetchAllCoursesAPI({
-                        search: debouncedSearch,
-                        categories: selectedCategories,
-                        levels: selectedLevels
-                    }),
-                    studentInfo?._id ? getCourseOrderDetailsAPI() : Promise.resolve([])
-                ]);
-
-                setCourses(coursesResponse?.data);
-                if (studentInfo?._id) {
-                    setPurchasedCourses(purchasedResponse?.map((order: any) => order.courseId._id));
-                }
-            } catch (error) {
-                toast.error("Error loading course list. Please try again!");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
+        
         fetchCourses();
     }, [debouncedSearch, selectedCategories, selectedLevels, studentInfo?._id]);
 
@@ -88,11 +83,7 @@ const AllCourseList: React.FC = () => {
     };
 
     const handleViewCourse = (courseId: string) => {
-        if (purchasedCourses.includes(courseId)) {
-            navigate(`/course-view/${courseId}`);
-        } else {
-            navigate(`/course/${courseId}`);
-        }
+        navigate(`/course/${courseId}`);
     };
 
     const handleCategoryChange = (categoryId: string) => {
@@ -207,12 +198,12 @@ const AllCourseList: React.FC = () => {
                                             className="bg-yellow-500 text-white px-4 py-2 rounded"
                                             onClick={() => handleViewCourse(course._id)}
                                         >
-                                            {purchasedCourses.includes(course._id) ? 'Go to Course' : 'View Course'}
+                                            View Course
                                         </Button>
                                     </div>
                                 </div>
                             ))}
-                        </div>
+                        </div> 
                     )}
 
                     {!isLoading && courses.length === 0 && (

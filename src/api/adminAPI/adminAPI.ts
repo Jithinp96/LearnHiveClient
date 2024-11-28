@@ -50,6 +50,14 @@ export const getStudentsListAPI = async () => {
     }
 };
 
+export const getStudentDetailsAPI = async (studentId: string) => {
+    try {
+        return axiosInstance.get(`/admin/student/${studentId}`)
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getTutorListAPI = async () => {
     try {
         // return await axios.get(`${import.meta.env.VITE_API_URL}/admin/tutors`, 
@@ -57,6 +65,14 @@ export const getTutorListAPI = async () => {
         //     withCredentials: true, 
         // });
         return axiosInstance.get('/admin/tutors')
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getTutorDetailsAPI = async (tutorId: string) => {
+    try {
+        return axiosInstance.get(`/admin/tutor/${tutorId}`)
     } catch (error) {
         throw error;
     }

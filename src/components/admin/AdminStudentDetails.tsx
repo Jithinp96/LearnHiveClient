@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { User, BadgeCheck, BadgeX } from 'lucide-react';
 import axios from 'axios';
+import { getStudentDetailsAPI } from '@/api/adminAPI/adminAPI';
 
 interface Stat {
   label: string;
@@ -29,7 +30,7 @@ const AdminStudentDetails: React.FC = () => {
     useEffect(() => {
         const fetchStudentDetails = async (studentId: string) => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/student/${studentId}`);
+                const response = await getStudentDetailsAPI(studentId)
                 setStudentDetails(response.data);
                 setIsBlocked(response.data.isBlocked);
                 setLoading(false);

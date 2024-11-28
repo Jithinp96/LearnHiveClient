@@ -243,6 +243,7 @@ export interface Message {
   message: string;
   sent: boolean;
   time: string;
+  createdAt?: string,
   senderId?: string;
   receiverId?: string;
   status?: 'sent' | 'delivered' | 'read';

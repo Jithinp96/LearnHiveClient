@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Star } from 'lucide-react';
+import { Clock, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
@@ -34,27 +34,43 @@ interface PurchasedCourse {
 const PurchasedCourses: React.FC = () => {
     const [courses, setCourses] = useState<PurchasedCourse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalCourses: 0
+    });
     const navigate = useNavigate();
 
     const { studentInfo } = useSelector((state: RootState) => state.student);
 
-    useEffect(() => {
-        const fetchPurchasedCourses = async () => {
-            try {
-                if (studentInfo?._id) {
-                    setIsLoading(true);
-                    const orderDetails = await getCourseOrderDetailsAPI();
-                    setCourses(orderDetails);
-                }
-            } catch (error) {
-                toast.error("Error fetching purchased courses. Please try again!")
-            } finally {
-                setIsLoading(false);
+    const fetchPurchasedCourses = async (page = 1) => {
+        try {
+            if (studentInfo?._id) {
+                setIsLoading(true);
+                const response = await getCourseOrderDetailsAPI(page);
+                setCourses(response.courseOrders);
+                setPagination({
+                    currentPage: response.currentPage,
+                    totalPages: response.totalPages,
+                    totalCourses: response.totalOrders
+                });
             }
-        };
+        } catch (error) {
+            toast.error("Error fetching purchased courses. Please try again!")
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchPurchasedCourses();
     }, [studentInfo]);
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage > 0 && newPage <= pagination.totalPages) {
+            fetchPurchasedCourses(newPage);
+        }
+    };
 
     const handleContinueLearning = (courseId: string) => {
         navigate(`/course-view/${courseId}`);
@@ -85,20 +101,21 @@ const PurchasedCourses: React.FC = () => {
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {courses.map((course) => (
-                            <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
-                                <img 
-                                    src={course.courseId.thumbnailUrl} 
-                                    alt={course.courseId.title} 
-                                    className="w-full h-48 object-cover" 
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = '/placeholder-course-image.jpg';
-                                    }}
-                                />
-                                <div className="p-4 flex-grow">
-                                    <span className="text-xs font-semibold text-gray-500">{course.courseId.category.name}</span>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            {courses.map((course) => (
+                                <div key={course._id} className="border rounded-lg overflow-hidden flex flex-col">
+                                    <img 
+                                        src={course.courseId.thumbnailUrl} 
+                                        alt={course.courseId.title} 
+                                        className="w-full h-48 object-cover" 
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = '/placeholder-course-image.jpg';
+                                        }}
+                                    />
+                                    <div className="p-4 flex-grow">
+                                        <span className="text-xs font-semibold text-gray-500">{course.courseId.category.name}</span>
                                         <h2 className="text-xl font-semibold mb-2">{course.courseId.title}</h2>
                                         <div className="flex items-center text-sm text-gray-600 mb-2">
                                             <span className="mr-4">{course.courseId.level}</span>
@@ -119,8 +136,34 @@ const PurchasedCourses: React.FC = () => {
                                         </Button>
                                     </div>
                                 </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+
+                        {/* Pagination Controls */}
+                        {pagination.totalPages > 1 && (
+                            <div className="flex justify-center items-center mt-4 space-x-2">
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    disabled={pagination.currentPage === 1}
+                                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="text-sm text-gray-500">
+                                    Page {pagination.currentPage} of {pagination.totalPages}
+                                </span>
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    disabled={pagination.currentPage === pagination.totalPages}
+                                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

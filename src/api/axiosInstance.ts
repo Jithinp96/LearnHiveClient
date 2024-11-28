@@ -10,24 +10,20 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Add response interceptor to handle 401 errors
 axiosInstance.interceptors.response.use(
-  (response) => response, // Pass successful responses through
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Reset Redux slices
       store.dispatch(logoutStudent());
       store.dispatch(logoutTutor());
       store.dispatch(clearAdminToken());
 
-      // Clear persisted storage
       persistor.purge();
       toast.error("Your session has expired. Please login again!")
-      // Optionally redirect to login page
+
       // window.location.href = "/login"; // Adjust to your login page route
     }
 
-    // Reject the error for further handling
     return Promise.reject(error);
   }
 );
