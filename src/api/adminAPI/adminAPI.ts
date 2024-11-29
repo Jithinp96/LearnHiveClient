@@ -58,6 +58,14 @@ export const getStudentDetailsAPI = async (studentId: string) => {
     }
 }
 
+export const toggleStudentStatusAPI = async(studentId: string, isBlocked: boolean) => {
+    try {
+        return axiosInstance.patch(`/admin/student/${studentId}/block`, { isBlocked })
+    } catch (error) {
+        throw error
+    }
+}
+
 export const getTutorListAPI = async () => {
     try {
         // return await axios.get(`${import.meta.env.VITE_API_URL}/admin/tutors`, 
@@ -75,6 +83,14 @@ export const getTutorDetailsAPI = async (tutorId: string) => {
         return axiosInstance.get(`/admin/tutor/${tutorId}`)
     } catch (error) {
         throw error;
+    }
+}
+
+export const toggleTutorStatusAPI = async(tutorId: string, isBlocked: boolean) => {
+    try {
+        return axiosInstance.patch(`/admin/tutor/${tutorId}/block`, { isBlocked })
+    } catch (error) {
+        throw error
     }
 }
 
@@ -171,9 +187,9 @@ export const approveCourseAPI = async(courseId: string) => {
     }
 }
 
-export const toggleBlockCourseAPI = async(courseId: string, isBlocked: boolean) => {
+export const toggleBlockCourseAPI = async(courseId: string, isBlocked: boolean, isListed: boolean) => {
     try {
-        return await axiosInstance.put(`/admin/course/${courseId}/toggle-status`, { isBlocked });
+        return await axiosInstance.put(`/admin/course/${courseId}/toggle-status`, { isBlocked, isListed });
     } catch (error) {
         throw error;
     }

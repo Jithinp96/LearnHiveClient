@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   Calendar, 
-  IndianRupee, 
-  Users, 
+  IndianRupee,
   Clock, 
   Tag, 
   Book, 
@@ -91,7 +90,6 @@ const AdminCourseDetails: React.FC = () => {
     const fetchCourse = async () => {
       try {
         const response = await getCourseDetails(courseId!);
-        console.log("response: ", response);
         if (response?.status === 200) {
           setCourse(response.data);
         } else {
@@ -116,7 +114,6 @@ const AdminCourseDetails: React.FC = () => {
       } else {
         toast.error("Failed to approve course")
       }
-      console.log('Course approved');
     } catch (error) {
       setError('Failed to approve course');
     }
@@ -124,11 +121,13 @@ const AdminCourseDetails: React.FC = () => {
 
   const handleToggleBlock = async () => {
     try {
-      const response = await toggleBlockCourseAPI(courseId, !course?.isBlocked);
+      const response = await toggleBlockCourseAPI(courseId, !course?.isBlocked, !course?.isListed);
       if (response?.status === 200) {
-        setCourse(prev => prev ? { ...prev, isBlocked: !prev.isBlocked } : null);
+        setCourse(prev => prev ? { ...prev, isBlocked: !prev.isBlocked, isListed: !prev.isListed } : null);
+        toast.success("Course status changed successfully")
+      } else {
+        toast.error("Failed to change course status. Please try again!")
       }
-      console.log('Course block status toggled');
     } catch (error) {
       setError('Failed to update block status');
     }
@@ -362,11 +361,11 @@ const AdminCourseDetails: React.FC = () => {
                     <span className="font-medium">₹{course.price}</span>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  {/* <div className="flex items-center space-x-2">
                     <Users className="h-5 w-5 text-gray-500" />
                     <span className="text-gray-600">Enrolled:</span>
                     <span className="font-medium">{course.purchaseCount} students</span>
-                  </div>
+                  </div> */}
 
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-5 w-5 text-gray-500" />
