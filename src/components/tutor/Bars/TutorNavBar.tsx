@@ -24,7 +24,7 @@ const TutorNavbar : React.FC = () => {
 
   const handleLogout = async () => {
     
-    const response = await logoutTutorAPI('tutor')
+    const response = await logoutTutorAPI()
     console.log(response);
     
     dispatch(logoutTutor());

@@ -41,9 +41,9 @@ export const googleLoginTutorAPI = async (credentials: string) => {
 };
 
 // Tutor logout
-export const logoutTutorAPI = async (role: string) => {
+export const logoutTutorAPI = async () => {
     try {
-        return await axiosInstance.post(`/tutor/logout/${role}`);
+        return await axiosInstance.post(`/tutor/logout`);
     } catch (error) {
         // console.error("Error in logoutTutorAPI:", error);
         throw error;

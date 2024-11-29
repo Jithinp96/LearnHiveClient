@@ -11,7 +11,7 @@ const AdminNavbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await logoutAdminAPI('admin');
+      const response = await logoutAdminAPI();
       console.log(response);
       
       dispatch(clearAdminToken());

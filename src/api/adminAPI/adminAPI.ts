@@ -18,13 +18,13 @@ export const adminLoginAPI = async (email: string, password: string) => {
     }
 }
 
-export const logoutAdminAPI = async (role: string) => {
+export const logoutAdminAPI = async () => {
     // return await axios.post(
     //     `${import.meta.env.VITE_API_URL}/admin/logout/${role}`, 
     //     {}, 
     //     { withCredentials: true });
     try {
-        return axiosInstance.post(`/admin/logout/${role}`)
+        return axiosInstance.post(`/admin/logout`)
     } catch (error) {
         throw error
     }
