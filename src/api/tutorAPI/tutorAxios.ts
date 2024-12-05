@@ -295,6 +295,20 @@ export const editCourseAPI = async(
     videos: object[],
 ) => {
     try {
+        console.log("Inside edit courseApi");
+        console.log(courseId,
+            title,
+            description,
+            shortDescription,
+            tags,
+            category,
+            price,
+            level,
+            thumbnailUrl,
+            duration,
+            videos,);
+        
+        
         return await axiosInstance.put(`/tutor/edit-course/${courseId}`, {
             courseId,
             title,

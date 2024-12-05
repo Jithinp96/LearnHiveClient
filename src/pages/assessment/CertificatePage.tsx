@@ -1,5 +1,5 @@
 import React from "react";
-import Certificate from "@/components/student/Course/Certificate";
+import Certificate from "@/components/Assessments/Certificate";
 
 const CertificatePage: React.FC = () => {
     return(

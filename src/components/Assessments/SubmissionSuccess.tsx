@@ -7,6 +7,7 @@ import { CheckCircle } from 'lucide-react';
 interface SubmissionSuccessProps {
   assessment: {
     score: number;
+    assessmentId: string;
     _id: string;
   };
 }
@@ -15,12 +16,16 @@ const SubmissionSuccess: React.FC<SubmissionSuccessProps> = ({ assessment }) => 
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate('/assessments');
+    navigate('/assessment-list');
   };
 
   const handleViewResult = () => {
     navigate(`/assessment-result/${assessment._id}`);
   };
+
+  const handleViewCertificate = () => {
+    navigate(`/certificate/${assessment.assessmentId}`)
+  }
 
   return (
     <Card className="w-full max-w-lg mx-auto mt-12 bg-green-50 border-green-400">
@@ -43,6 +48,7 @@ const SubmissionSuccess: React.FC<SubmissionSuccessProps> = ({ assessment }) => 
                     Go Back
                 </Button>
                 <Button onClick={handleViewResult}>View Result</Button>
+                <Button onClick={handleViewCertificate}>View Certificate</Button>
             </div>
         </CardContent>
     </Card>

@@ -27,7 +27,8 @@ import AssessmentGuidelinesPage from "@/pages/assessment/AssessmentGuidelinesPag
 import AssessmentInterfacePage from "@/pages/assessment/AssessmentInterfacePage";
 import SubmissionSuccessPage from "@/pages/assessment/SubmissionSuccessPage";
 import AssessmentResultPage from "@/pages/assessment/AssessmentResultPage";
-import CertificatePage from "@/pages/student/CertificatePage";
+import CertificatePage from "@/pages/assessment/CertificatePage";
+import SubmissionFailedPage from "@/pages/assessment/SubmissionFailedPage";
 
 const StudentRoutes: React.FC = () => {
   return (
@@ -56,8 +57,9 @@ const StudentRoutes: React.FC = () => {
         <Route path="/assessment-guidelines/:assessmentId" element={<AssessmentGuidelinesPage />} />
         <Route path="/start-assessment/:assessmentId" element={ <AssessmentInterfacePage /> } />
         <Route path='/assessment-complete' element={<SubmissionSuccessPage />} />
+        <Route path='/assessment-failed' element={<SubmissionFailedPage />} />
         <Route path="/assessment-result/:assessmentId" element={<AssessmentResultPage />} />
-        <Route path="/certificate" element={< CertificatePage />} />
+        <Route path="/certificate/:assessmentId" element={< CertificatePage />} />
       </Route>
       
       <Route path="/allcourses" element={<AllCourseListPage />} />

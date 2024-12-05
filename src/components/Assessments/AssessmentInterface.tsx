@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Timer, CheckCircle } from 'lucide-react';
 import { fetchAssessmentByIdAPI, submitAssessmentAPI } from '@/api/assessmentAPI/assessmentAPI';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 interface Question {
   _id: string;
@@ -83,21 +84,70 @@ const AssessmentInterface: React.FC = () => {
     return assessment?.questions.every((q) => selectedAnswers[q._id] !== undefined) ?? false;
   };
 
+  // const handleSubmit = async () => {
+  //   if (!assessment || isSubmitting) return;
+
+  //   setIsSubmitting(true);
+  //   try {
+  //     const response = await submitAssessmentAPI(assessment._id, selectedAnswers);
+  //     if(response?.status === 200) {
+  //       const { data } = response;
+  //       toast.success("Assessment submitted successfully!");
+  //       navigate('/assessment-complete', { state: { assessment: data } });
+  //     } else {
+  //       toast.error("Failed to submit assessment. Please try again!")
+  //     } 
+  //   } catch (error) {
+  //     setError('Failed to submit assessment');
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const handleSubmit = async () => {
     if (!assessment || isSubmitting) return;
-
     setIsSubmitting(true);
     try {
       const response = await submitAssessmentAPI(assessment._id, selectedAnswers);
-      if(response?.status === 200) {
-        const { data } = response;
+      if (response?.status === 200) {
         toast.success("Assessment submitted successfully!");
-        navigate('/assessment-complete', { state: { assessment: data } });
+        console.log(":response.data: ", response.data);
+        
+        navigate('/assessment-complete', { state: { assessment: response.data } });
+      } else if (response?.status === 400) {
+        const errorMessage = response.data?.message || "You did not meet the passing criteria.";
+        toast.error(errorMessage);
+        navigate('/assessment-result', { 
+          state: { 
+            assessment, 
+            selectedAnswers, 
+            message: errorMessage 
+          } 
+        });
       } else {
-        toast.error("Failed to submit assessment. Please try again!")
+        toast.error("Failed to submit assessment. Please try again!");
       } 
     } catch (error) {
-      setError('Failed to submit assessment');
+      // Improved error handling
+      if (axios.isAxiosError(error) && error.response) {
+        // If it's an Axios error with a response
+        const errorMessage = error.response.data?.message || "Failed to submit assessment";
+        toast.error(errorMessage);
+        
+        // Check if it's a 400 error specifically
+        if (error.response.status === 400) {
+          navigate('/assessment-failed', { 
+            state: { 
+              assessment, 
+              selectedAnswers, 
+              message: errorMessage 
+            } 
+          });
+        }
+      } else {
+        // Generic error handling
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsSubmitting(false);
     }

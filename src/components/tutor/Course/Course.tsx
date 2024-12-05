@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 import { RootState } from '@/redux/store';
 import { fetchTutorCoursesAPI } from '@/api/tutorAPI/tutorAxios';
+import Loader from "@/components/ui/Loader";
 
 interface Category {
     name: string
@@ -72,7 +73,7 @@ const Course: React.FC = () => {
 
                 <div className="mt-8 bg-white p-6 rounded-lg shadow">
                     {isLoading ? (
-                        <p>Loading courses...</p>
+                        <Loader />
                     ) : error ? (
                         <p className="text-red-600">{error}</p>
                     ) : courses.length === 0 ? (
@@ -85,7 +86,7 @@ const Course: React.FC = () => {
                                     <th>Category</th>
                                     <th>Created On</th>
                                     <th>Status</th>
-                                    {/* <th>Action</th> */}
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>

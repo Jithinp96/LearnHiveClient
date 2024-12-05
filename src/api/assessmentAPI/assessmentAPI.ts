@@ -41,11 +41,20 @@ export const submitAssessmentAPI = async (assessmentId: string, responses: Recor
     }
 }
 
-export const fetchAssessmentResultAPI = async(asseessmentId: string) => {
+export const fetchAssessmentResultAPI = async(assessmentId: string) => {
     try {
-        const response = await axiosInstance.get(`/assessment/assessment-result/${asseessmentId}`)
+        const response = await axiosInstance.get(`/assessment/assessment-result/${assessmentId}`)
         return response
     } catch (error) {
         throw error;
+    }
+}
+
+export const fetchCertificateAPI = async(assessmentId: string) => {
+    try {
+        const response = await axiosInstance.get(`/assessment/certificate/${assessmentId}`);
+        return response.data
+    } catch (error) {
+        throw error
     }
 }

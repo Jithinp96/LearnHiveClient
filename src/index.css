@@ -76,3 +76,21 @@
     display: none;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #certificate-container, 
+  #certificate-container * {
+    visibility: visible;
+  }
+  
+  #certificate-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
