@@ -86,7 +86,7 @@ const Course: React.FC = () => {
                                     <th>Category</th>
                                     <th>Created On</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    {/* <th>Action</th> */}
                                 </tr>
                             </thead>
                             <tbody>
