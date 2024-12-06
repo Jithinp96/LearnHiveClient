@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Award, Printer, Download } from 'lucide-react';
+import { Award, Download } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import Loader from '../ui/Loader';
 import { fetchCertificateAPI } from '@/api/assessmentAPI/assessmentAPI';
@@ -45,9 +45,9 @@ const Certificate: React.FC = () => {
     fetchCertificateData();
   }, [assessmentId]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // const handlePrint = () => {
+  //   window.print();
+  // };
 
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return;
@@ -86,13 +86,13 @@ const Certificate: React.FC = () => {
     <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200">
       {/* Certificate Print Buttons */}
       <div className="mb-4 print:hidden">
-        <Button 
+        {/* <Button 
           onClick={handlePrint} 
           variant="outline" 
           className="mr-4"
         >
           <Printer className="mr-2" /> Print Certificate
-        </Button>
+        </Button> */}
         <Button 
           onClick={handleDownloadPDF}
           variant="default"

@@ -121,7 +121,7 @@ const StudentAssessmentList: React.FC = () => {
 
   const handleButtonClick = (assessment: Assessment) => {
     if (assessment.status === 'completed') {
-      navigate(`/results/${assessment._id}`);
+      navigate(`/certificate/${assessment._id}`);
     } else {
       navigate(`/assessment-guidelines/${assessment._id}`);
     }
